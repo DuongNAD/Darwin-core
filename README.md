@@ -96,9 +96,11 @@ gene theo từng ngày.
 - **Giả thuyết của `scarcity` chưa được ủng hộ** ở 5 bản lặp × 20 ngày: tốc độ,
   cảm nhận và trao đổi chất đều có khoảng tin cậy chứa 0. Hiệu ứng có thể xuất
   hiện ở thời lượng dài hơn — đó chính là lý do khoảng tin cậy tồn tại.
-- **Vòng chạy trực tiếp vẫn ở luồng chính.** Worker mới chỉ gánh phần lặp lại.
-  Khi quần thể lớn, nút 4x không đạt được 4x; giao diện hiện nhịp thật bên cạnh
-  thay vì im lặng.
+- **Vòng chạy trực tiếp ở luồng chính** (worker chỉ gánh phần lặp lại). Đo trong
+  trình duyệt cho thấy điều này ổn: ngay ở trần quần thể 460 kèm sinh sản hữu
+  tính, một nhịp tốn 0.614 ms, nên 4x chỉ cần ~15% một lõi và 4 nhịp mỗi khung
+  hình — bộ chặn 28 nhịp không chạm tới. Giao diện vẫn hiện nhịp thật bên cạnh
+  nút tốc độ để phòng máy yếu hoặc tab bị đẩy xuống nền.
 - Tính trạng là số thực liên tục, không phải allele. Mọi phát biểu về di truyền
   quần thể ở đây là phát biểu về **tính trạng số lượng**.
 
