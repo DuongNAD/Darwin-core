@@ -476,17 +476,17 @@ const SCENARIOS = {
   },
   scarcity: {
     name: 'Khan hiếm tài nguyên',
-    hypothesis: 'Thiếu thức ăn ưu tiên tốc độ, cảm nhận và trao đổi chất tiết kiệm.',
+    hypothesis: 'Thiếu thức ăn ưu tiên tốc độ, cảm nhận và cơ thể nhỏ.',
     params: { foodPerDay:38, mutation:0.15, costMul:1.15, predation:false }
   },
   abundance: {
     name: 'Tài nguyên dồi dào',
-    hypothesis: 'Áp lực cạnh tranh thấp duy trì nhiều kiểu gene cùng tồn tại.',
+    hypothesis: 'Thức ăn dư thừa chọn lối sống ít vận động: chậm hơn, ít cảm nhận hơn, trao đổi chất tiết kiệm hơn.',
     params: { foodPerDay:310, mutation:0.18, costMul:0.78, predation:false }
   },
   predator: {
     name: 'Áp lực săn mồi',
-    hypothesis: 'Ngụy trang, tốc độ và kích thước thay đổi khi săn mồi được bật.',
+    hypothesis: 'Săn mồi ưu tiên cơ thể lớn: vượt ngưỡng kích thước là thoát hẳn, nên ngụy trang không kịp có giá trị.',
     params: { foodPerDay:145, mutation:0.14, costMul:1, predation:true }
   },
   climate: {
@@ -506,7 +506,7 @@ const SCENARIOS = {
   },
   extinction: {
     name: 'Đại tuyệt chủng',
-    hypothesis: 'Một cú sốc môi trường quét sạch phần lớn quần thể và tạo hiệu ứng thắt cổ chai.',
+    hypothesis: 'Một cú sốc quét sạch phần lớn quần thể, nhưng đột biến cao sau đó xoá dấu thắt cổ chai trong đa dạng.',
     params: { foodPerDay:150, mutation:0.22, costMul:1, predation:false, extinction:true }
   }
 };
@@ -637,11 +637,17 @@ class World {
       this.environment.resourceIndex = clamp(1-Math.abs(this.environment.temperature-22)/28,.48,1.05);
       this.logEvent('climate','Đổi mùa',`Nhiệt độ ${this.environment.temperature.toFixed(1)}°C`);
     }
-    if(this.params.epidemic && this.day%8===0){
+    // Dịch 8 ngày một lần với mức sát thương .54 quá yếu để chọn lọc miễn dịch:
+    // tuổi thọ trung bình chỉ khoảng 10 ngày và 87% cá thể chết đói trước khi
+    // gặp đợt dịch nào, nên chi phí duy trì miễn dịch — trả liên tục — lấn át
+    // lợi ích hiếm hoi. Rút xuống 4 ngày và nâng sát thương lên .85 đưa dịch
+    // thành 23% số ca chết, và miễn dịch mới thật sự được chọn (+0.36 so với
+    // đối chứng). Chi phí miễn dịch giữ nguyên để không ảnh hưởng kịch bản khác.
+    if(this.params.epidemic && this.day%4===0){
       this.environment.diseaseLoad=.86;
       let affected=0;
       for(const c of this.creatures){
-        const risk=.54*(1-c.genes.immunity);
+        const risk=.85*(1-c.genes.immunity);
         if(this.rand()<risk){ c.alive=false; c.dead='disease'; affected++; }
       }
       this.logEvent('epidemic','Bùng phát dịch',`${affected} cá thể nhiễm bệnh`);

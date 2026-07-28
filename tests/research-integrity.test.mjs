@@ -486,6 +486,47 @@ test("Q_ST measures divergence only where subpopulations exist", async () => {
   assert.ok(islands.history.at(-1).differentiation !== undefined, "history tracks divergence");
 });
 
+test("epidemics actually select for immunity", async () => {
+  const engine = await loadEngine();
+
+  // With outbreaks every 8 days at 54% lethality the pressure was too weak to
+  // matter: most creatures starved long before meeting one, while immunity's
+  // upkeep was paid every tick. Immunity ended up no different from the control.
+  const sample = (scenario) => {
+    const values = [];
+    let diseaseShare = 0;
+    // Immunity accumulates over outbreaks, so a short run cannot resolve it:
+    // at 35 days the same comparison sits at +0.11 with a CI straddling zero.
+    const seeds = [11, 22, 33, 44, 55, 66, 77, 88];
+    for (const seed of seeds) {
+      const world = new engine.World({ seed, scenario });
+      world.runTicks(engine.TICKS_PER_DAY * 45);
+      const row = engine.replicateStudy(world);
+      if (!row.extinct) values.push(row.immunity);
+      const causes = world.researchMetrics().deathCauses;
+      const total = Object.values(causes).reduce((a, b) => a + b, 0) || 1;
+      diseaseShare += causes.disease / total / seeds.length;
+    }
+    return { values, diseaseShare };
+  };
+
+  const control = sample("baseline");
+  const epidemic = sample("epidemic");
+  assert.ok(epidemic.values.length >= 5, "the scenario must stay survivable");
+
+  const delta = engine.welchDifference(control.values, epidemic.values);
+  const report =
+    `${delta.difference.toFixed(3)} [${delta.low.toFixed(3)}, ${delta.high.toFixed(3)}]`;
+  assert.ok(delta.low > 0, `immunity must rise above the control (${report})`);
+  assert.ok(delta.difference > 0.1, `the gain must be substantial, not marginal (${report})`);
+  assert.ok(
+    epidemic.diseaseShare > 0.1,
+    `disease must be a real cause of death (${(epidemic.diseaseShare * 100).toFixed(0)}%)`,
+  );
+  // Baseline has no outbreaks at all, so its immunity is pure drift against cost.
+  assert.equal(control.diseaseShare, 0);
+});
+
 test("the two islands select different foraging strategies", async () => {
   const engine = await loadEngine();
 

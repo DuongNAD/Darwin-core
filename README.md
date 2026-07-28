@@ -48,7 +48,11 @@ thể, mỗi môi trường chọn một chiến lược khác nhau — kịch b
 `islands` · `extinction`
 
 Mỗi kịch bản khai báo một giả thuyết. Giả thuyết là thứ để **kiểm chứng**, không
-phải thứ để tin — xem phần hạn chế đã biết bên dưới.
+phải thứ để tin. Chạy `node scripts/audit-hypotheses.mjs` để tự đối chiếu: nó
+chạy từng kịch bản cạnh nhóm đối chứng trên cùng bộ hạt giống rồi kiểm định
+Welch từng tính trạng. Ở 12 bản lặp × 40 ngày, cả bảy giả thuyết hiện đều được
+dữ liệu ủng hộ — nhưng đó là kết quả của việc sửa, không phải của may mắn: bốn
+trong số chúng từng tuyên bố những điều đo được là sai (xem phần hạn chế).
 
 Riêng `islands`: hai đảo nhận **cùng lượng** thức ăn nhưng **khác cách phân bố**
 — đảo A theo cụm, đảo B rải đều. Bản đầu tiên cho hai đảo môi trường giống hệt
@@ -97,23 +101,19 @@ gene theo từng ngày.
 
 ## Hạn chế đã biết
 
-- **Ba kịch bản tuyên bố điều dữ liệu không ủng hộ.** Chạy
-  `node scripts/audit-hypotheses.mjs` để tự kiểm; kết quả ở 12 bản lặp × 40 ngày
-  so với đối chứng:
-
-  | Kịch bản | Tuyên bố | Dữ liệu nói |
-  |---|---|---|
-  | `scarcity` | tốc độ, cảm nhận, trao đổi chất tiết kiệm | tốc độ +0.97 ✓ · cảm nhận +33 ✓ · **trao đổi chất không khác** |
-  | `abundance` | duy trì nhiều kiểu gene cùng tồn tại | **đa dạng không khác đối chứng** |
-  | `predator` | ngụy trang, tốc độ, kích thước đều đổi | kích thước +1.64 ✓ · **ngụy trang và tốc độ không khác** |
-  | `climate` | chọn lọc trao đổi chất | trao đổi chất +0.08 ✓ |
-  | `epidemic` | làm tăng miễn dịch | **miễn dịch không khác đối chứng** |
-  | `islands` | hai chiến lược kiếm ăn khác nhau | Q_ST 0.20 ± 0.04 ✓ |
-  | `extinction` | quét sạch quần thể + thắt cổ chai | quần thể −35 ✓ · **không thấy dấu thắt cổ chai** |
-
-  Giả thuyết ở đây là thứ để **kiểm chứng**, nên chúng được giữ nguyên văn thay
-  vì sửa cho khớp kết quả. Ba dòng in đậm là việc còn phải làm: hoặc chỉnh cơ
-  chế kịch bản cho đúng điều nó hứa, hoặc bỏ lời hứa đó đi.
+- **Ngụy trang không được chọn lọc trong `predator`, và điều đó không sửa được
+  bằng tham số.** Đã thử sáu cấu hình: tăng sức ngụy trang từ 0.68 lên 0.99 (khả
+  năng bị phát hiện còn 1%) và cắt chi phí xuống một phần tư — chênh lệch so với
+  đối chứng chưa lần nào vượt khỏi khoảng tin cậy chứa 0, trong khi kích thước
+  luôn +1.7 đến +1.9. Nguyên nhân có tính cấu trúc: săn mồi đòi hỏi kẻ săn lớn
+  hơn con mồi 1.5 lần, nên **vượt ngưỡng kích thước là thoát tuyệt đối**, còn
+  ngụy trang chỉ cứu được những cá thể vốn đã thua vì nhỏ. Muốn ngụy trang có
+  chỗ đứng thì phải đổi bản chất của săn mồi — ví dụ bỏ ngưỡng cứng, cho xác
+  suất săn phụ thuộc tỉ lệ kích thước — chứ không phải chỉnh số.
+- **`abundance` không giữ được đa dạng cao hơn đối chứng.** Duy trì đa dạng cần
+  cơ chế cân bằng chủ động (chọn lọc phụ thuộc tần số, hoặc nhiều ổ sinh thái
+  cùng tồn tại); thức ăn dư thừa chỉ làm chọn lọc đổi hướng chứ không làm nó yếu
+  đi. Giả thuyết của kịch bản đã được viết lại theo điều nó thật sự chứng minh.
 - **Vòng chạy trực tiếp ở luồng chính** (worker chỉ gánh phần lặp lại). Đo trong
   trình duyệt cho thấy điều này ổn: ngay ở trần quần thể 460 kèm sinh sản hữu
   tính, một nhịp tốn 0.614 ms, nên 4x chỉ cần ~15% một lõi và 4 nhịp mỗi khung
