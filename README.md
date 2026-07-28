@@ -50,6 +50,15 @@ thể, mỗi môi trường chọn một chiến lược khác nhau — kịch b
 Mỗi kịch bản khai báo một giả thuyết. Giả thuyết là thứ để **kiểm chứng**, không
 phải thứ để tin — xem phần hạn chế đã biết bên dưới.
 
+Riêng `islands`: hai đảo nhận **cùng lượng** thức ăn nhưng **khác cách phân bố**
+— đảo A theo cụm, đảo B rải đều. Bản đầu tiên cho hai đảo môi trường giống hệt
+nhau, nên chọn lọc như nhau ở hai bên và chỉ còn trôi dạt di truyền phân hoá
+chúng; đo được Q_ST ≈ 0.055, tức kịch bản không bao giờ làm được điều giả thuyết
+của chính nó nói. Với phân bố khác nhau, Q_ST lên 0.20 ± 0.04 và gene phân hoá
+mạnh nhất là tốc độ, trao đổi chất, cảm nhận — đúng nhóm tính trạng quyết định
+cách kiếm ăn. Giữ nguyên tổng tài nguyên để không đảo nào thành bẫy chết: đảo
+nhỏ hơn vẫn giữ khoảng 60 cá thể.
+
 ## Làm nghiên cứu, không chỉ xem cho vui
 
 **Hạt giống tái lập được.** Sân mô phỏng có kích thước logic cố định
@@ -88,11 +97,6 @@ gene theo từng ngày.
 
 ## Hạn chế đã biết
 
-- **Kịch bản `islands` không tách nhánh.** Q_ST đo được chỉ 0.03 ± 0.05 sau 20
-  ngày × 4 bản lặp — khoảng tin cậy chứa 0. Lý do: hai đảo có môi trường giống
-  hệt nhau nên chọn lọc như nhau ở hai bên, chỉ còn trôi dạt di truyền, mà trôi
-  dạt quá yếu ở quy mô quần thể này. Muốn thấy phân nhánh thật thì phải cho hai
-  đảo môi trường khác nhau.
 - **Giả thuyết của `scarcity` chưa được ủng hộ** ở 5 bản lặp × 20 ngày: tốc độ,
   cảm nhận và trao đổi chất đều có khoảng tin cậy chứa 0. Hiệu ứng có thể xuất
   hiện ở thời lượng dài hơn — đó chính là lý do khoảng tin cậy tồn tại.

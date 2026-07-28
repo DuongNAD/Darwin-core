@@ -261,7 +261,7 @@
         <button class="scenario-card" data-scenario="predator"><b>Săn mồi</b><small>CHẠY TRỐN · NGỤY TRANG</small></button>
         <button class="scenario-card" data-scenario="climate"><b>Khí hậu mùa</b><small>NÓNG · LẠNH TUẦN HOÀN</small></button>
         <button class="scenario-card" data-scenario="epidemic"><b>Dịch bệnh</b><small>MIỄN DỊCH CÓ CHI PHÍ</small></button>
-        <button class="scenario-card" data-scenario="islands"><b>Hai hòn đảo</b><small>CÁCH LY · PHÂN NHÁNH</small></button>
+        <button class="scenario-card" data-scenario="islands"><b>Hai hòn đảo</b><small>CỤM VS RẢI · PHÂN NHÁNH</small></button>
         <button class="scenario-card" data-scenario="extinction"><b>Đại tuyệt chủng</b><small>THẮT CỔ CHAI DI TRUYỀN</small></button>
       </div>
     </section>
@@ -501,7 +501,7 @@ const SCENARIOS = {
   },
   islands: {
     name: 'Cách ly địa lý',
-    hypothesis: 'Hai đảo bị ngăn cách tích lũy khác biệt gene và hình thành nhánh riêng.',
+    hypothesis: 'Hai đảo cùng lượng thức ăn nhưng khác cách phân bố sẽ chọn ra hai chiến lược kiếm ăn khác nhau.',
     params: { foodPerDay:160, mutation:0.2, costMul:0.94, predation:false, islands:true }
   },
   extinction: {
@@ -763,6 +763,23 @@ class World {
         const z=nutrients[Math.floor(this.rand()*nutrients.length)];
         x=this.rr(z.x+8,z.x+z.w-8);
         y=this.rr(z.y+8,z.y+z.h-8);
+      } else if(this.params.islands){
+        // Hai đảo nhận LƯỢNG thức ăn như nhau nhưng PHÂN BỐ khác hẳn: đảo A
+        // theo cụm, đảo B rải đều. Trước đây hai đảo giống hệt nhau, nên chọn
+        // lọc như nhau ở hai bên và chỉ còn trôi dạt phân hoá chúng — quá yếu ở
+        // quy mô quần thể này, và kịch bản không bao giờ làm được điều giả
+        // thuyết của chính nó nói. Giữ nguyên tổng tài nguyên để khác biệt đến
+        // từ cách phải đi kiếm ăn, không phải từ việc một bên nghèo hơn.
+        if(this.rand()<.5){
+          const patch=Math.floor(this.rand()*3);
+          const cx=this.W*0.47*(0.22+patch*0.28);
+          const cy=this.H*(0.24+patch*0.26);
+          x=clamp(cx+this.gauss()*this.W*0.035, 14, this.W*0.47-14);
+          y=clamp(cy+this.gauss()*this.H*0.06, 14, this.H-14);
+        } else {
+          x=this.rr(this.W*0.53+14, this.W-14);
+          y=this.rr(14, this.H-14);
+        }
       } else {
         x=this.rr(14,this.W-14);
         y=this.rr(14,this.H-14);
@@ -1438,7 +1455,8 @@ globalThis.DarwinEngine = {
   const ZONE_NAMES={
     nutrient:'Dinh dưỡng',drought:'Khô hạn',shelter:'Nơi trú ẩn',
     thermal:'Nhiệt độ',disease:'Ổ dịch',barrier:'Rào cách ly',
-    'island-a':'Đảo A','island-b':'Đảo B',toxin:'Độc tố',ash:'Tro bụi'
+    'island-a':'Đảo A · thức ăn theo cụm','island-b':'Đảo B · thức ăn rải đều',
+    toxin:'Độc tố',ash:'Tro bụi'
   };
   let scenarioA='baseline';
   let scenarioB='scarcity';

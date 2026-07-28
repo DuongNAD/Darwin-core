@@ -446,6 +446,48 @@ test("Q_ST measures divergence only where subpopulations exist", async () => {
   assert.ok(islands.history.at(-1).differentiation !== undefined, "history tracks divergence");
 });
 
+test("the two islands select different foraging strategies", async () => {
+  const engine = await loadEngine();
+
+  // Equal food on both sides, clustered on A and scattered on B. With
+  // identical islands only drift separated them, and drift is far too weak at
+  // this population size — the scenario never did what its hypothesis claimed.
+  const runs = [];
+  for (const seed of [11, 22, 33, 44, 55]) {
+    const world = new engine.World({ seed, scenario: "islands" });
+    world.runTicks(engine.TICKS_PER_DAY * 45);
+    const report = world.researchMetrics().differentiation;
+    assert.ok(report, `seed ${seed} must keep both islands populated`);
+    assert.ok(report.sizes[0] > 5 && report.sizes[1] > 5,
+      `neither island may collapse (got ${report.sizes.join(" vs ")})`);
+    runs.push(report);
+  }
+
+  const summary = engine.summarize(runs.map((r) => r.mean));
+  assert.ok(
+    summary.low > 0.1,
+    `divergence must be unambiguous, not drift (Q_ST ${summary.mean.toFixed(3)} ± ${summary.ci.toFixed(3)})`,
+  );
+
+  // The split should show up in foraging traits, not spread evenly by chance.
+  const perGene = {};
+  for (const run of runs) {
+    for (const [gene, value] of Object.entries(run.perGene)) {
+      perGene[gene] = (perGene[gene] || 0) + value / runs.length;
+    }
+  }
+  const ranked = Object.entries(perGene).sort((a, b) => b[1] - a[1]);
+  assert.ok(
+    ["speed", "perception", "metabolism"].includes(ranked[0][0]),
+    `a foraging trait should diverge most, got ${ranked[0][0]}`,
+  );
+
+  // A scenario without a barrier must still report nothing.
+  const baseline = new engine.World({ seed: 11, scenario: "baseline" });
+  baseline.runTicks(engine.TICKS_PER_DAY * 10);
+  assert.equal(baseline.researchMetrics().differentiation, null);
+});
+
 test("reproduction mode is a study-level variable applied to both arms", () => {
   // Same rule as the environment sliders: anything that changes the mechanism
   // must reach A and B together, or the comparison is confounded again.
