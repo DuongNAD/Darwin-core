@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Phòng thí nghiệm chọn lọc tự nhiên: tám kịch bản môi trường, bảy gene, đối chứng A/B và nghiên cứu lặp lại kèm khoảng tin cậy." />
 <title>DARWIN LAB — Chọn lọc tự nhiên</title>
 <style>
   :root{
@@ -34,7 +35,7 @@
     -webkit-font-smoothing:antialiased;
   }
   .app{
-    display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:18px;
+    display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:18px;
     padding:18px;height:100vh;min-height:560px;
   }
   @media (max-width:1080px){
@@ -131,6 +132,75 @@
   .legend{display:flex;flex-direction:column;gap:8px;font-size:11.5px;color:var(--ink-dim);line-height:1.45}
   .legend div{display:flex;gap:9px;align-items:flex-start}
   .legend .dot{margin-top:3px;flex:none}
+  /* ---------- RESEARCH LAB ---------- */
+  .research-setup{padding:12px 14px}
+  .research-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  .research-top h2{margin:0;font-size:10.5px;letter-spacing:.18em;color:var(--ink-faint)}
+  .research-top .hypothesis{font-size:11px;color:var(--ink-dim);line-height:1.35;flex:1}
+  .scenario-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+  .scenario-card{padding:8px 9px;text-align:left;min-width:0;background:rgba(0,0,0,.18)}
+  .scenario-card b{display:block;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .scenario-card small{display:block;margin-top:3px;font:9.5px var(--mono);color:var(--ink-faint)}
+  .scenario-card.on{border-color:var(--perc);background:rgba(95,227,192,.12);box-shadow:inset 0 0 0 1px rgba(95,227,192,.12)}
+  .study-controls{display:flex;align-items:center;gap:8px}
+  select{
+    color:var(--ink);background:#20242c;border:1px solid var(--panel-line);
+    border-radius:8px;padding:7px 9px;font:11px var(--sans);max-width:190px
+  }
+  .compare-picker[hidden]{display:none}
+  .compare-tag{position:absolute;right:12px;top:10px;font:10.5px var(--mono);color:#6f6858;pointer-events:none}
+  .stats.research{grid-template-columns:repeat(3,1fr)}
+  .stats.research .stat .v{font-size:16px}
+  .gene-matrix{display:grid;gap:8px}
+  .gene-row{display:grid;grid-template-columns:102px 1fr 54px;gap:8px;align-items:center}
+  .gene-label{font-size:11px;color:var(--ink-dim)}
+  .gene-track{height:7px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden}
+  .gene-fill{height:100%;width:0;border-radius:8px;transition:width .28s ease}
+  .gene-value{text-align:right;font:10.5px var(--mono);color:var(--ink)}
+  .event-log{display:grid;gap:7px;max-height:178px;overflow:auto}
+  .event-empty{font-size:11px;color:var(--ink-faint);line-height:1.45}
+  .event-item{display:grid;grid-template-columns:42px 1fr;gap:9px;padding:7px 8px;border-left:2px solid var(--perc);background:rgba(0,0,0,.18);border-radius:5px}
+  .event-item time{font:9.5px var(--mono);color:var(--ink-faint)}
+  .event-item b{display:block;font-size:11px;margin-bottom:2px}
+  .event-item span{font-size:10.5px;color:var(--ink-dim);line-height:1.35}
+  .conclusion{font-size:11.5px;line-height:1.58;color:var(--ink-dim);padding:10px 11px;border:1px solid rgba(95,227,192,.16);background:rgba(95,227,192,.055);border-radius:9px}
+  .lab-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .lab-actions button{padding:7px 9px;font-size:11px}
+  .timeline-row{display:grid;grid-template-columns:54px 1fr 46px;gap:8px;align-items:center;margin-top:11px}
+  .timeline-row label,.timeline-row output{font:10px var(--mono);color:var(--ink-faint)}
+  .compare-table{display:grid;grid-template-columns:1fr auto auto;gap:6px 10px;font-size:10.5px}
+  .compare-table .head{color:var(--ink-faint);font:9.5px var(--mono)}
+  .compare-table .num{font:10.5px var(--mono);text-align:right}
+  /* ---------- replicate study ---------- */
+  .replicate-setup{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+  .replicate-setup label{display:block;font-size:11.5px;color:var(--ink-dim)}
+  .replicate-setup b{font-family:var(--mono);color:var(--ink);font-weight:500;float:right}
+  .replicate-setup input[type=range]{margin-top:6px}
+  .replicate-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .replicate-status{font-size:11px;color:var(--ink-faint);flex:1;min-width:120px}
+  .replicate-progress{height:3px;border-radius:3px;background:rgba(255,255,255,.1);margin-top:10px;overflow:hidden}
+  .replicate-progress i{display:block;height:100%;width:0;background:var(--perc);transition:width .18s ease}
+  .replicate-table{display:grid;grid-template-columns:1fr auto;gap:3px 10px;margin-top:10px;font-size:11.5px}
+  .replicate-table.ab{grid-template-columns:1fr auto auto auto}
+  .replicate-table .head{font-size:9.5px;letter-spacing:.12em;color:var(--ink-faint)}
+  .replicate-table .num{font-family:var(--mono);text-align:right;color:var(--ink-dim);white-space:nowrap}
+  .replicate-table .sig{color:var(--perc)}
+  .replicate-table .ns{color:var(--ink-faint)}
+  .speed-actual{font-family:var(--mono);font-size:10.5px;color:var(--size);letter-spacing:.02em}
+  .gene-sel{font-family:var(--mono);font-size:9.5px;margin-left:6px}
+  .gene-sel.up{color:var(--perc)}
+  .gene-sel.down{color:var(--danger)}
+  .param-contrast{display:flex;flex-direction:column;gap:4px;margin-top:8px;
+    font:10.5px var(--mono);color:var(--ink-dim);line-height:1.5}
+  .param-contrast b{color:var(--perc);margin-right:6px}
+  .ctl.locked{opacity:.5}
+  .ctl.locked input[type=range]{cursor:not-allowed}
+  .switch input:disabled{opacity:.45;cursor:not-allowed}
+  .zone-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .zone-chip{font:9.5px var(--mono);padding:3px 6px;border-radius:20px;border:1px solid rgba(255,255,255,.1);color:var(--ink-dim)}
+  .toast{position:fixed;left:50%;bottom:24px;z-index:50;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+    background:#0e1116;border:1px solid var(--panel-line);border-radius:9px;padding:9px 13px;font-size:11.5px;transition:.2s}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
   /* tooltip */
   [data-tip]{position:relative}
   [data-tip]:hover::after{
@@ -140,6 +210,10 @@
     box-shadow:0 10px 26px rgba(0,0,0,.5);pointer-events:none;
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  @media (max-width:1320px){
+    .scenario-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .scenario-card small{display:none}
+  }
 </style>
 </head>
 <body>
@@ -156,6 +230,42 @@
       </div>
     </header>
 
+    <section class="research-setup glass">
+      <div class="research-top">
+        <h2>THIẾT KẾ NGHIÊN CỨU</h2>
+        <div class="study-controls">
+          <div class="seg" id="studyMode">
+            <button data-mode="single" class="on">Một quần thể</button>
+            <button data-mode="compare">Đối chứng A/B</button>
+          </div>
+          <label class="compare-picker" id="comparePicker" hidden>
+            B:
+            <select id="scenarioB" aria-label="Kịch bản đối chứng B">
+              <option value="scarcity">Khan hiếm tài nguyên</option>
+              <option value="abundance">Tài nguyên dồi dào</option>
+              <option value="predator">Áp lực săn mồi</option>
+              <option value="climate">Khí hậu theo mùa</option>
+              <option value="epidemic">Dịch bệnh tiến hóa</option>
+              <option value="islands">Cách ly địa lý</option>
+              <option value="extinction">Đại tuyệt chủng</option>
+              <option value="baseline">Đối chứng tự nhiên</option>
+            </select>
+          </label>
+        </div>
+        <div class="hypothesis" id="hypothesis">Quần thể tiến tới cân bằng khi tài nguyên và khí hậu ổn định.</div>
+      </div>
+      <div class="scenario-grid" id="scenarioGrid">
+        <button class="scenario-card on" data-scenario="baseline"><b>Đối chứng tự nhiên</b><small>ỔN ĐỊNH · KIỂM SOÁT</small></button>
+        <button class="scenario-card" data-scenario="scarcity"><b>Khan hiếm</b><small>CẠNH TRANH CAO</small></button>
+        <button class="scenario-card" data-scenario="abundance"><b>Dồi dào</b><small>ĐA DẠNG CÙNG TỒN TẠI</small></button>
+        <button class="scenario-card" data-scenario="predator"><b>Săn mồi</b><small>CHẠY TRỐN · NGỤY TRANG</small></button>
+        <button class="scenario-card" data-scenario="climate"><b>Khí hậu mùa</b><small>NÓNG · LẠNH TUẦN HOÀN</small></button>
+        <button class="scenario-card" data-scenario="epidemic"><b>Dịch bệnh</b><small>MIỄN DỊCH CÓ CHI PHÍ</small></button>
+        <button class="scenario-card" data-scenario="islands"><b>Hai hòn đảo</b><small>CÁCH LY · PHÂN NHÁNH</small></button>
+        <button class="scenario-card" data-scenario="extinction"><b>Đại tuyệt chủng</b><small>THẮT CỔ CHAI DI TRUYỀN</small></button>
+      </div>
+    </section>
+
     <div class="bar glass">
       <button id="btnRun" class="primary">Chạy</button>
       <button id="btnStep" class="ghost">Bước 1 nhịp</button>
@@ -167,15 +277,22 @@
         <button data-sp="2">2x</button>
         <button data-sp="4">4x</button>
       </div>
+      <span class="speed-actual" id="speedActual" hidden></span>
       <div class="spacer"></div>
-      <label class="switch" data-tip="Cá thể lớn hơn đối thủ ít nhất 40% có thể ăn thịt đối thủ. Bật lên, kích thước lớn chuyển từ gánh nặng thành vũ khí.">
+      <label class="switch" data-tip="Cá thể lớn hơn đối thủ ít nhất 50% có thể ăn thịt đối thủ. Bật lên, kích thước lớn chuyển từ gánh nặng thành vũ khí.">
         <input type="checkbox" id="chkPred"><span>Săn mồi</span>
+      </label>
+      <label class="switch" data-tip="Bật lên, con thừa hưởng mỗi gene từ một trong hai cha mẹ (tái tổ hợp) thay vì là bản sao có đột biến của một cá thể. Cha mẹ phải tìm được nhau trong bán kính cảm nhận. Đổi công tắc này sẽ dựng lại thí nghiệm.">
+        <input type="checkbox" id="chkSexual"><span>Hữu tính</span>
       </label>
     </div>
 
     <div class="stage">
-      <canvas id="arena"></canvas>
+      <!-- Sân mô phỏng thuần hình ảnh, nên nó tự mô tả trạng thái bằng chữ cho
+           trình đọc màn hình; số liệu đầy đủ nằm ở bảng bên phải. -->
+      <canvas id="arena" role="img" aria-label="Sân mô phỏng đang chờ dữ liệu."></canvas>
       <div class="daytag" id="dayTag">NGÀY 1</div>
+      <div class="compare-tag" id="compareTag"></div>
       <div class="stage-hint">Nhấp vào một sinh vật để theo dõi gene và bán kính cảm nhận của nó</div>
     </div>
   </div>
@@ -184,34 +301,38 @@
   <div class="right">
     <section class="card glass">
       <h2>SỐ LIỆU SỐNG</h2>
-      <div class="stats">
+      <div class="stats research">
         <div class="stat"><div class="k">QUẦN THỂ</div><div class="v" id="sPop">0</div></div>
         <div class="stat"><div class="k">NGÀY / THẾ HỆ</div><div class="v" id="sDay">0<small id="sGen">g0</small></div></div>
         <div class="stat"><div class="k">THỨC ĂN CÒN LẠI</div><div class="v" id="sFood">0</div></div>
         <div class="stat"><div class="k">SINH / CHẾT</div><div class="v" id="sBD">0<small>/0</small></div></div>
+        <div class="stat"><div class="k">ĐA DẠNG GENE</div><div class="v" id="sDiversity">0.000</div></div>
+        <div class="stat" data-tip="Số con trung bình của những cá thể đã sống hết đời — thước đo thành công sinh sản trọn đời."><div class="k">SỐ CON TRỌN ĐỜI</div><div class="v" id="sFitness">0.00</div></div>
+        <div class="stat" data-tip="Nghịch đảo chỉ số Simpson trên dòng dõi: số dòng dõi hiệu dụng, không phải kích thước quần thể hiệu dụng Ne."><div class="k">DÒNG DÕI HIỆU DỤNG</div><div class="v" id="sEffective">0</div></div>
+        <div class="stat"><div class="k">NHIỆT ĐỘ</div><div class="v" id="sTemperature">22<small>°C</small></div></div>
+        <div class="stat"><div class="k">DÒNG DÕI CÒN LẠI</div><div class="v" id="sLineages">0</div></div>
+        <div class="stat" data-tip="Q_ST đo mức phân hoá tính trạng giữa hai tiểu quần thể bị cách ly. Chỉ có nghĩa ở kịch bản có rào cách ly."><div class="k">PHÂN HOÁ Q_ST</div><div class="v" id="sDifferentiation">—</div></div>
       </div>
     </section>
 
     <section class="card glass">
-      <h2>LỊCH SỬ QUẦN THỂ</h2>
-      <div class="chartwrap"><canvas id="chPop" class="mini"></canvas></div>
-      <div class="tip">Đường xanh: số cá thể theo ngày. Đường mờ: lượng thức ăn trên sân.</div>
+      <h2>ĐƯỜNG CONG NGHIÊN CỨU</h2>
+      <div class="chartwrap"><canvas id="researchChart" class="mini" role="img" aria-label="Đường cong quần thể và đa dạng di truyền theo ngày; số liệu từng ngày có ở thanh dòng thời gian bên dưới."></canvas></div>
+      <div class="tip">Xanh: quần thể A · Hồng: quần thể B · Vàng: đa dạng di truyền.</div>
     </section>
 
     <section class="card glass">
       <h2>PHÂN BỐ GENE</h2>
-      <div class="hist">
-        <div class="histhead"><span class="nm"><i class="dot" style="background:var(--speed)"></i>Tốc độ</span><span class="mv" id="mSpeed">—</span></div>
-        <div class="chartwrap small"><canvas id="chSpeed" class="mini"></canvas></div>
+      <div class="gene-matrix">
+        <div class="gene-row" data-gene="speed"><span class="gene-label">Tốc độ</span><span class="gene-track"><i class="gene-fill" id="gSpeed" style="background:#ff7eb6"></i></span><span class="gene-value" id="mSpeed">—</span></div>
+        <div class="gene-row" data-gene="size"><span class="gene-label">Kích thước</span><span class="gene-track"><i class="gene-fill" id="gSize" style="background:#ffd166"></i></span><span class="gene-value" id="mSize">—</span></div>
+        <div class="gene-row" data-gene="perception"><span class="gene-label">Cảm nhận</span><span class="gene-track"><i class="gene-fill" id="gPerc" style="background:#5fe3c0"></i></span><span class="gene-value" id="mPerc">—</span></div>
+        <div class="gene-row" data-gene="metabolism"><span class="gene-label">Trao đổi chất</span><span class="gene-track"><i class="gene-fill" id="gMetabolism" style="background:#7aa7ff"></i></span><span class="gene-value" id="mMetabolism">—</span></div>
+        <div class="gene-row" data-gene="immunity"><span class="gene-label">Miễn dịch</span><span class="gene-track"><i class="gene-fill" id="gImmunity" style="background:#b997ff"></i></span><span class="gene-value" id="mImmunity">—</span></div>
+        <div class="gene-row" data-gene="camouflage"><span class="gene-label">Ngụy trang</span><span class="gene-track"><i class="gene-fill" id="gCamouflage" style="background:#8ed081"></i></span><span class="gene-value" id="mCamouflage">—</span></div>
+        <div class="gene-row" data-gene="fecundity"><span class="gene-label">Sinh sản</span><span class="gene-track"><i class="gene-fill" id="gFecundity" style="background:#ff9f68"></i></span><span class="gene-value" id="mFecundity">—</span></div>
       </div>
-      <div class="hist">
-        <div class="histhead"><span class="nm"><i class="dot" style="background:var(--size)"></i>Kích thước</span><span class="mv" id="mSize">—</span></div>
-        <div class="chartwrap small"><canvas id="chSize" class="mini"></canvas></div>
-      </div>
-      <div class="hist">
-        <div class="histhead"><span class="nm"><i class="dot" style="background:var(--perc)"></i>Cảm nhận</span><span class="mv" id="mPerc">—</span></div>
-        <div class="chartwrap small"><canvas id="chPerc" class="mini"></canvas></div>
-      </div>
+      <div class="tip">▲▼ là chênh lệch chọn lọc qua sinh sản của ngày vừa khép lại (đồng nhất thức Robertson–Price), tính theo phần trăm dải gene. Nó không bao gồm chọn lọc qua sống sót, nên có thể ngược chiều với thay đổi thực tế.</div>
     </section>
 
     <section class="card glass">
@@ -220,20 +341,74 @@
     </section>
 
     <section class="card glass">
+      <h2>KẾT LUẬN KHOA HỌC TỰ ĐỘNG</h2>
+      <div class="conclusion" id="conclusion">Thu thập thêm dữ liệu để hình thành kết luận.</div>
+    </section>
+
+    <section class="card glass" id="comparisonCard" hidden>
+      <h2>SO SÁNH ĐỐI CHỨNG A/B</h2>
+      <div class="compare-table" id="comparisonTable"></div>
+      <div class="tip">Đây là kết quả của một lần chạy duy nhất. Muốn phát biểu về kịch bản, hãy chạy nhiều bản lặp bên dưới.</div>
+    </section>
+
+    <section class="card glass">
+      <h2>NGHIÊN CỨU LẶP LẠI</h2>
+      <div class="replicate-setup">
+        <label>Số bản lặp <b id="vReplicates">8</b>
+          <input type="range" id="rReplicates" min="3" max="20" step="1" value="8" aria-label="Số bản lặp">
+        </label>
+        <label>Số ngày mỗi bản <b id="vRepDays">30</b>
+          <input type="range" id="rRepDays" min="10" max="90" step="5" value="30" aria-label="Số ngày mỗi bản">
+        </label>
+      </div>
+      <div class="replicate-actions">
+        <button id="btnReplicate" class="primary">Chạy lặp lại</button>
+        <button id="btnReplicateCancel" class="ghost" hidden>Dừng</button>
+        <span class="replicate-status" id="replicateStatus">Mỗi bản dùng một hạt giống khác nhau.</span>
+      </div>
+      <div class="replicate-progress" id="replicateProgress" hidden><i></i></div>
+      <div class="replicate-table" id="replicateTable"></div>
+      <div class="tip" id="replicateNote">Kết quả báo cáo dạng trung bình ± khoảng tin cậy 95%. Trong chế độ đối chứng, cả A và B đều được lặp và chênh lệch được kiểm định Welch.</div>
+    </section>
+
+    <section class="card glass">
+      <h2>NHẬT KÝ SỰ KIỆN</h2>
+      <div class="event-log" id="eventLog"><div class="event-empty">Chưa có biến cố môi trường.</div></div>
+    </section>
+
+    <section class="card glass">
       <h2>THAM SỐ MÔI TRƯỜNG</h2>
       <div class="ctl" data-tip="Nguồn thức ăn rơi xuống mỗi ngày. Ít thức ăn thì cạnh tranh gay gắt và quần thể có thể sụp đổ.">
-        <label>Thức ăn mỗi ngày <b id="vFood">140</b></label>
+        <label for="rFood">Thức ăn mỗi ngày <b id="vFood">140</b></label>
         <input type="range" id="rFood" min="10" max="400" step="5" value="140">
       </div>
       <div class="ctl" data-tip="Biên độ đột biến khi con thừa hưởng gene. 0 = bản sao hoàn hảo, tiến hóa đứng yên.">
-        <label>Tần suất đột biến <b id="vMut">12%</b></label>
+        <label for="rMut">Tần suất đột biến <b id="vMut">12%</b></label>
         <input type="range" id="rMut" min="0" max="40" step="1" value="12">
       </div>
       <div class="ctl" data-tip="Nhân toàn bộ chi phí trao đổi chất. Tăng lên, môi trường khắc nghiệt hơn và ưu ái cơ thể nhỏ, tiết kiệm.">
-        <label>Chi phí năng lượng <b id="vCost">1.00x</b></label>
+        <label for="rCost">Chi phí năng lượng <b id="vCost">1.00x</b></label>
         <input type="range" id="rCost" min="40" max="220" step="5" value="100">
       </div>
-      <div class="tip">Ba tham số này áp dụng ngay lập tức, không cần đặt lại.</div>
+      <div class="tip" id="paramNote">Ba tham số này áp dụng ngay lập tức, không cần đặt lại.</div>
+      <div class="param-contrast" id="paramContrast" hidden></div>
+      <div class="zone-legend" id="zoneLegend"></div>
+    </section>
+
+    <section class="card glass">
+      <h2>SỔ TAY PHÒNG THÍ NGHIỆM</h2>
+      <div class="lab-actions">
+        <button id="btnSave">Lưu trạng thái</button>
+        <button id="btnLoad">Khôi phục</button>
+        <button id="btnExportJson">Xuất JSON</button>
+        <button id="btnExportCsv">Xuất CSV</button>
+      </div>
+      <div class="timeline-row">
+        <label for="timeline">DÒNG THỜI GIAN</label>
+        <input type="range" id="timeline" min="0" max="0" value="0">
+        <output id="timelineDay">Ngày 1</output>
+      </div>
+      <div class="tip" id="timelineInsight">Kéo để xem lại số liệu theo ngày; trạng thái hiện tại không bị thay đổi.</div>
     </section>
 
     <section class="card glass">
@@ -242,29 +417,99 @@
         <div><i class="dot" style="background:var(--speed)"></i><span><b>Tốc độ</b> — tới thức ăn trước đối thủ, nhưng chi phí tăng theo bình phương tốc độ.</span></div>
         <div><i class="dot" style="background:var(--size)"></i><span><b>Kích thước</b> — ăn được cá thể nhỏ hơn nhiều, nhưng cơ thể lớn đốt năng lượng liên tục.</span></div>
         <div><i class="dot" style="background:var(--perc)"></i><span><b>Cảm nhận</b> — thấy thức ăn từ xa thay vì lang thang, đổi lại tốn năng lượng duy trì giác quan.</span></div>
-        <div><i class="dot" style="background:#8d97a8"></i><span>Màu thân là hỗn hợp của ba gene, nên bạn nhìn thấy quần thể đổi màu khi chọn lọc diễn ra.</span></div>
+        <div><i class="dot" style="background:#7aa7ff"></i><span><b>Trao đổi chất</b> — khai thác năng lượng hiệu quả hơn nhưng tạo áp lực lên tuổi thọ.</span></div>
+        <div><i class="dot" style="background:#b997ff"></i><span><b>Miễn dịch</b> — giảm nguy cơ chết vì dịch và độc tố nhưng tốn năng lượng duy trì.</span></div>
+        <div><i class="dot" style="background:#8ed081"></i><span><b>Ngụy trang</b> — giảm xác suất bị phát hiện trong kịch bản săn mồi.</span></div>
+        <div><i class="dot" style="background:#ff9f68"></i><span><b>Sinh sản</b> — rút ngắn ngưỡng sinh con nhưng làm con non ít năng lượng hơn.</span></div>
       </div>
     </section>
   </div>
 </div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script>
+<!-- Engine đứng riêng một thẻ script để Web Worker nạp lại đúng mã nguồn này,
+     thay vì phải nhân bản engine thành hai bản dễ trôi khỏi nhau. -->
+<script id="simCore">
 // ===== SIM CORE START =====
 function mulberry32(a){
-  return function(){
+  const random = function(){
     a |= 0; a = (a + 0x6D2B79F5) | 0;
     let t = Math.imul(a ^ (a >>> 15), 1 | a);
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+  random.getState=()=>a|0;
+  random.setState=(state)=>{ a=state|0; };
+  return random;
 }
-const RANGE = { speed:[0.35,4.6], size:[0.60,3.3], perception:[12,210] };
+const RANGE = {
+  speed:[0.35,4.6],
+  size:[0.60,3.3],
+  perception:[12,210],
+  metabolism:[0.55,1.60],
+  immunity:[0,1],
+  camouflage:[0,1],
+  fecundity:[0.65,1.45]
+};
+// Sân mô phỏng có kích thước logic cố định: cùng một hạt giống phải cho cùng
+// một kết quả bất kể cửa sổ trình duyệt rộng bao nhiêu. Renderer co giãn hình
+// ảnh, không co giãn thế giới.
+const SIM_WIDTH = 960;
+const SIM_HEIGHT = 600;
 const TICKS_PER_DAY = 200;
 const FOOD_ENERGY = 55;
 const FOOD_CAP = 900;
 const SOFT_CAP = 300;
 const HARD_CAP = 460;
 const clamp = (v,a,b)=> v<a?a:(v>b?b:v);
+// Hệ số của mô hình năng lượng hai phần (xem chi tiết ở hàm step).
+// LOAD đặt vị trí tối ưu: cá thể tham chiếu có m* ≈ 1.15, nằm giữa dải [0.55, 1.60].
+// SCALE chuẩn hoá để mức khắc nghiệt tại điểm tối ưu ngang với mô hình một-phần cũ.
+const METABOLIC_LOAD = 2;
+const METABOLIC_SCALE = 0.793858;
+const GENE_KEYS = ['speed','size','perception','metabolism','immunity','camouflage','fecundity'];
+const SCENARIOS = {
+  baseline: {
+    name: 'Đối chứng tự nhiên',
+    hypothesis: 'Quần thể tiến tới cân bằng khi tài nguyên và khí hậu ổn định.',
+    params: { foodPerDay:140, mutation:0.12, costMul:1, predation:false }
+  },
+  scarcity: {
+    name: 'Khan hiếm tài nguyên',
+    hypothesis: 'Thiếu thức ăn ưu tiên tốc độ, cảm nhận và trao đổi chất tiết kiệm.',
+    params: { foodPerDay:38, mutation:0.15, costMul:1.15, predation:false }
+  },
+  abundance: {
+    name: 'Tài nguyên dồi dào',
+    hypothesis: 'Áp lực cạnh tranh thấp duy trì nhiều kiểu gene cùng tồn tại.',
+    params: { foodPerDay:310, mutation:0.18, costMul:0.78, predation:false }
+  },
+  predator: {
+    name: 'Áp lực săn mồi',
+    hypothesis: 'Ngụy trang, tốc độ và kích thước thay đổi khi săn mồi được bật.',
+    params: { foodPerDay:145, mutation:0.14, costMul:1, predation:true }
+  },
+  climate: {
+    name: 'Khí hậu theo mùa',
+    hypothesis: 'Chu kỳ nóng lạnh tạo dao động quần thể và chọn lọc trao đổi chất.',
+    params: { foodPerDay:160, mutation:0.16, costMul:1, predation:false, climate:true }
+  },
+  epidemic: {
+    name: 'Dịch bệnh tiến hóa',
+    hypothesis: 'Dịch định kỳ làm tăng miễn dịch dù miễn dịch có chi phí duy trì.',
+    params: { foodPerDay:155, mutation:0.18, costMul:0.92, predation:false, epidemic:true }
+  },
+  islands: {
+    name: 'Cách ly địa lý',
+    hypothesis: 'Hai đảo bị ngăn cách tích lũy khác biệt gene và hình thành nhánh riêng.',
+    params: { foodPerDay:160, mutation:0.2, costMul:0.94, predation:false, islands:true }
+  },
+  extinction: {
+    name: 'Đại tuyệt chủng',
+    hypothesis: 'Một cú sốc môi trường quét sạch phần lớn quần thể và tạo hiệu ứng thắt cổ chai.',
+    params: { foodPerDay:150, mutation:0.22, costMul:1, predation:false, extinction:true }
+  }
+};
 
 class Creature {
   constructor(id, x, y, genes, energy, birthDay, gen){
@@ -273,6 +518,9 @@ class Creature {
     this.age=0; this.eaten=0; this.gen=gen; this.birthDay=birthDay;
     this.heading=0; this.alive=true; this.dead=null;
     this.wobble=0; this.flash=0;
+    this.lineage=id; this.parentId=null; this.otherParentId=null; this.offspring=0;
+    // số con sinh trong ngày hiện tại, dùng cho chênh lệch chọn lọc
+    this.offspringToday=0;
   }
   get radius(){ return 5.2 + this.genes.size*5.2; }
   get maxEnergy(){ return 90 + this.genes.size*70; }
@@ -281,13 +529,19 @@ class Creature {
 class World {
   constructor(opts){
     opts = opts || {};
-    this.W = opts.width || 960;
-    this.H = opts.height || 600;
+    this.W = opts.width || SIM_WIDTH;
+    this.H = opts.height || SIM_HEIGHT;
+    this.scenarioId = SCENARIOS[opts.scenario] ? opts.scenario : 'baseline';
+    const scenarioParams = SCENARIOS[this.scenarioId].params;
     this.params = {
-      foodPerDay: opts.foodPerDay ?? 140,
-      mutation:   opts.mutation   ?? 0.12,
-      costMul:    opts.costMul    ?? 1.0,
-      predation:  opts.predation  ?? false
+      ...scenarioParams,
+      foodPerDay: opts.foodPerDay ?? scenarioParams.foodPerDay,
+      mutation:   opts.mutation   ?? scenarioParams.mutation,
+      costMul:    opts.costMul    ?? scenarioParams.costMul,
+      predation:  opts.predation  ?? scenarioParams.predation,
+      // Vô tính là mặc định. Bật hữu tính lên là đổi hẳn cơ chế di truyền:
+      // con không còn là bản sao có đột biến của một cha mẹ.
+      sexual:     opts.sexual     ?? scenarioParams.sexual ?? false
     };
     this.seed = opts.seed ?? 20260728;
     this.reset();
@@ -297,32 +551,229 @@ class World {
     this.nextId = 1;
     this.creatures = [];
     this.food = [];
+    this.eventLog = [];
+    this.environment = {
+      temperature: 22,
+      diseaseLoad: 0,
+      resourceIndex: 1,
+      shock: 0
+    };
+    this.zones = this.createZones();
+    this.extinctionTriggered = false;
     this.tick = 0;
     this.day = 1;
     this.births = 0;
     this.deaths = 0;
+    this.deathCauses = { starve:0, age:0, predation:0, disease:0, catastrophe:0, toxin:0 };
     this.maxGen = 0;
+    // đời sống đã kết thúc: cơ sở để tính thành công sinh sản trọn đời
+    this.completedLives = { count:0, offspring:0 };
+    // chênh lệch chọn lọc của ngày vừa khép lại
+    this.lastSelection = this.zeroSelection();
     this.history = [];
     for(let i=0;i<45;i++){
       this.creatures.push(new Creature(
         this.nextId++,
         this.rr(40,this.W-40), this.rr(40,this.H-40),
-        { speed:this.rr(0.9,2.4), size:this.rr(0.8,1.7), perception:this.rr(35,95) },
+        {
+          speed:this.rr(0.9,2.4),
+          size:this.rr(0.8,1.7),
+          perception:this.rr(35,95),
+          metabolism:this.rr(0.82,1.18),
+          immunity:this.rr(0.12,0.48),
+          camouflage:this.rr(0.18,0.72),
+          fecundity:this.rr(0.86,1.18)
+        },
         120, 1, 0
       ));
     }
     this.spawnFood(180);
     this.record();
   }
+  createZones(){
+    const w=this.W, h=this.H;
+    if(this.scenarioId==='scarcity') return [
+      { type:'drought', x:w*.2, y:h*.18, w:w*.6, h:h*.64, intensity:.72 }
+    ];
+    if(this.scenarioId==='abundance') return [
+      { type:'nutrient', x:w*.08, y:h*.12, w:w*.34, h:h*.4, intensity:1.5 },
+      { type:'nutrient', x:w*.58, y:h*.5, w:w*.34, h:h*.38, intensity:1.35 }
+    ];
+    if(this.scenarioId==='predator') return [
+      { type:'shelter', x:w*.06, y:h*.1, w:w*.23, h:h*.3, intensity:.75 },
+      { type:'shelter', x:w*.72, y:h*.58, w:w*.22, h:h*.32, intensity:.75 }
+    ];
+    if(this.scenarioId==='climate') return [
+      { type:'thermal', x:0, y:0, w:w*.5, h, intensity:-1 },
+      { type:'thermal', x:w*.5, y:0, w:w*.5, h, intensity:1 }
+    ];
+    if(this.scenarioId==='epidemic') return [
+      { type:'disease', x:w*.3, y:h*.26, w:w*.4, h:h*.48, intensity:1 }
+    ];
+    if(this.scenarioId==='islands') return [
+      { type:'island-a', x:0, y:0, w:w*.47, h, intensity:1 },
+      { type:'barrier', x:w*.47, y:0, w:w*.06, h, intensity:1 },
+      { type:'island-b', x:w*.53, y:0, w:w*.47, h, intensity:1 }
+    ];
+    return [
+      { type:'nutrient', x:w*.14, y:h*.18, w:w*.25, h:h*.28, intensity:1.12 },
+      { type:'toxin', x:w*.68, y:h*.58, w:w*.16, h:h*.18, intensity:.2 }
+    ];
+  }
+  logEvent(type, title, detail){
+    this.eventLog.unshift({ day:this.day, type, title, detail });
+    if(this.eventLog.length>80) this.eventLog.length=80;
+  }
+  zoneAt(x,y){
+    for(let i=this.zones.length-1;i>=0;i--){
+      const z=this.zones[i];
+      if(x>=z.x && x<=z.x+z.w && y>=z.y && y<=z.y+z.h) return z;
+    }
+    return null;
+  }
+  applyDayDynamics(){
+    if(this.params.climate){
+      this.environment.temperature = 22 + Math.sin((this.day-1)*Math.PI/6)*12;
+      this.environment.resourceIndex = clamp(1-Math.abs(this.environment.temperature-22)/28,.48,1.05);
+      this.logEvent('climate','Đổi mùa',`Nhiệt độ ${this.environment.temperature.toFixed(1)}°C`);
+    }
+    if(this.params.epidemic && this.day%8===0){
+      this.environment.diseaseLoad=.86;
+      let affected=0;
+      for(const c of this.creatures){
+        const risk=.54*(1-c.genes.immunity);
+        if(this.rand()<risk){ c.alive=false; c.dead='disease'; affected++; }
+      }
+      this.logEvent('epidemic','Bùng phát dịch',`${affected} cá thể nhiễm bệnh`);
+    } else {
+      this.environment.diseaseLoad*=.72;
+    }
+    if(this.params.extinction && this.day===12 && !this.extinctionTriggered){
+      this.extinctionTriggered=true;
+      let lost=0;
+      for(const c of this.creatures){
+        if(this.rand()<.68){ c.alive=false; c.dead='catastrophe'; lost++; }
+      }
+      this.food.length=Math.floor(this.food.length*.12);
+      this.environment.shock=1;
+      this.zones.push({type:'ash',x:0,y:0,w:this.W,h:this.H,intensity:.75});
+      this.logEvent('extinction','Đại tuyệt chủng',`${lost} cá thể bị loại — hiệu ứng thắt cổ chai bắt đầu`);
+    }
+    this.environment.shock*=.84;
+  }
+  runTicks(n){
+    for(let i=0;i<n;i++) this.step();
+    return this;
+  }
+  snapshot(){
+    return {
+      version:2,
+      scenarioId:this.scenarioId,
+      seed:this.seed,
+      randomState:this.rand.getState(),
+      W:this.W,H:this.H,nextId:this.nextId,tick:this.tick,day:this.day,
+      births:this.births,deaths:this.deaths,maxGen:this.maxGen,
+      completedLives:{...this.completedLives},
+      lastSelection:{...this.lastSelection},
+      extinctionTriggered:this.extinctionTriggered,
+      params:{...this.params},
+      environment:{...this.environment},
+      deathCauses:{...this.deathCauses},
+      zones:this.zones.map(z=>({...z})),
+      food:this.food.map(f=>({...f})),
+      history:this.history.map(h=>({...h})),
+      eventLog:this.eventLog.map(e=>({...e})),
+      creatures:this.creatures.map(c=>({
+        ...c,genes:{...c.genes}
+      }))
+    };
+  }
+  static fromSnapshot(data){
+    const w=new World({
+      seed:data.seed,scenario:data.scenarioId,width:data.W,height:data.H
+    });
+    w.rand=mulberry32(data.randomState);
+    w.nextId=data.nextId; w.tick=data.tick; w.day=data.day;
+    w.births=data.births; w.deaths=data.deaths; w.maxGen=data.maxGen;
+    w.completedLives={count:0,offspring:0,...(data.completedLives||{})};
+    w.lastSelection={...w.zeroSelection(),...(data.lastSelection||{})};
+    w.extinctionTriggered=!!data.extinctionTriggered;
+    w.params={...data.params};
+    w.environment={...data.environment};
+    w.deathCauses={...data.deathCauses};
+    w.zones=data.zones.map(z=>({...z}));
+    w.food=data.food.map(f=>({...f}));
+    w.history=data.history.map(h=>({...h}));
+    w.eventLog=data.eventLog.map(e=>({...e}));
+    w.creatures=data.creatures.map(raw=>{
+      const c=new Creature(
+        raw.id,raw.x,raw.y,{...raw.genes},raw.energy,raw.birthDay,raw.gen
+      );
+      Object.assign(c,raw);
+      c.genes={...raw.genes};
+      return c;
+    });
+    return w;
+  }
   rr(a,b){ return a + this.rand()*(b-a); }
   gauss(){
     let u = 1 - this.rand(), v = this.rand();
     return Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
   }
+  detectionProbability(prey){
+    const camouflage=prey?.genes?.camouflage ?? 0;
+    const shelter=this.zoneAt(prey.x,prey.y)?.type==='shelter' ? .52 : 1;
+    return clamp((1-camouflage*.68)*shelter,.12,.94);
+  }
+  reproductionRequirement(creature){
+    const fecundity=creature?.genes?.fecundity ?? 1;
+    return {
+      food:clamp(2.55-fecundity*1.15,1,2),
+      energy:clamp(88-fecundity*18,60,78),
+      cost:clamp(66-fecundity*8,53,61),
+      // Đánh đổi thật của gene sinh sản: đẻ sớm hơn thì con non yếu hơn.
+      childEnergy:clamp(56-fecundity*8,44,52)
+    };
+  }
+  // Tuổi thọ: trao đổi chất nhanh đổi lấy năng lượng rẻ hơn bằng đời sống ngắn hơn.
+  lifespanTicks(genes){
+    return (2400 + genes.size*260) / genes.metabolism;
+  }
+  // Thứ tự duyệt ngẫu nhiên theo hạt giống. Nếu duyệt theo chỉ số mảng, cá thể
+  // đứng trước luôn nhặt thức ăn trước — một thiên lệch của cấu trúc dữ liệu,
+  // không phải của sinh học.
+  visitOrder(n){
+    const order = this._order || (this._order = []);
+    order.length = n;
+    for(let i=0;i<n;i++) order[i]=i;
+    for(let i=n-1;i>0;i--){
+      const j = Math.floor(this.rand()*(i+1));
+      const swap = order[i]; order[i]=order[j]; order[j]=swap;
+    }
+    return order;
+  }
   spawnFood(n){
     const room = Math.max(0, FOOD_CAP - this.food.length);
     n = Math.min(n, room);
-    for(let i=0;i<n;i++) this.food.push({ x:this.rr(14,this.W-14), y:this.rr(14,this.H-14) });
+    const nutrients=this.zones.filter(z=>z.type==='nutrient');
+    const drought=this.zones.find(z=>z.type==='drought');
+    for(let i=0;i<n;i++){
+      let x,y;
+      if(nutrients.length && this.rand()<(this.scenarioId==='abundance' ? .72 : .34)){
+        const z=nutrients[Math.floor(this.rand()*nutrients.length)];
+        x=this.rr(z.x+8,z.x+z.w-8);
+        y=this.rr(z.y+8,z.y+z.h-8);
+      } else {
+        x=this.rr(14,this.W-14);
+        y=this.rr(14,this.H-14);
+        if(drought && this.rand()<.78 && x>=drought.x && x<=drought.x+drought.w &&
+          y>=drought.y && y<=drought.y+drought.h){
+          x=x<this.W/2 ? this.rr(14,Math.max(15,drought.x-5)) :
+            this.rr(Math.min(this.W-15,drought.x+drought.w+5),this.W-14);
+        }
+      }
+      this.food.push({x,y});
+    }
   }
   // --- spatial hash ---
   buildGrid(items, cell){
@@ -356,8 +807,10 @@ class World {
     const buf = [];
     const eatenFood = new Set();
     const crowd = cs.length > SOFT_CAP ? 1 + (cs.length-SOFT_CAP)/SOFT_CAP : 1;
+    const order = this.visitOrder(cs.length);
 
-    for(let i=0;i<cs.length;i++){
+    for(let step=0;step<order.length;step++){
+      const i = order[step];
       const c = cs[i];
       if(!c.alive) continue;
       const g = c.genes;
@@ -380,6 +833,7 @@ class World {
           const oi = buf[k]; const o = cs[oi];
           if(oi===i || !o.alive) continue;
           if(g.size < o.genes.size*1.5) continue;
+          if(this.rand()>this.detectionProbability(o)) continue;
           const d = (o.x-c.x)*(o.x-c.x) + (o.y-c.y)*(o.y-c.y);
           if(d < best*0.85 && d < per*per){ best=d; tx=o.x; ty=o.y; preyIdx=oi; }
         }
@@ -401,8 +855,16 @@ class World {
         c.heading += d*0.16;
       }
       const v = g.speed*0.95*(0.72 + 0.28*g.size);   // sải chân dài hơn ở cơ thể lớn
+      const prevX=c.x;
       c.x = clamp(c.x + Math.cos(c.heading)*v, 6, this.W-6);
       c.y = clamp(c.y + Math.sin(c.heading)*v, 6, this.H-6);
+      if(this.params.islands){
+        const left=this.W*.47, right=this.W*.53;
+        if(c.x>left && c.x<right){
+          c.x=prevX<left ? left-2 : right+2;
+          c.heading=Math.PI-c.heading;
+        }
+      }
 
       // eat food on contact
       const reach = c.radius + 3;
@@ -431,19 +893,30 @@ class World {
       }
 
       // metabolism: speed² × size³ + giác quan + phí sống
-      const cost = P.costMul * crowd * (
-        0.021*g.size*g.size*g.speed*g.speed +
-        0.0016*per +
-        0.022*g.size*g.size +
-        0.030
-      );
+      const zone=this.zoneAt(c.x,c.y);
+      const thermalStress=P.climate ? Math.abs(this.environment.temperature-22)/22 : 0;
+      const zoneCost=zone?.type==='toxin' ? .085*(1-g.immunity) :
+        zone?.type==='disease' ? this.environment.diseaseLoad*.035*(1-g.immunity) :
+        zone?.type==='ash' ? .045 : 0;
+      // Chi phí năng lượng tách làm hai phần có hướng ngược nhau theo trao đổi chất:
+      //   vận động (di chuyển + giác quan) rẻ đi khi trao đổi chất nhanh
+      //   duy trì  (thân xác, miễn dịch, điều nhiệt) đắt lên khi trao đổi chất nhanh
+      // nên tối ưu nằm TRONG dải gene: m* = sqrt(work / (LOAD * maintenance)),
+      // và m* phụ thuộc chính bộ gene của từng cá thể. Mô hình cũ chia toàn bộ
+      // chi phí cho trao đổi chất, khiến gene này luôn leo tới trần và ngừng tiến hoá.
+      const work = 0.021*g.size*g.size*g.speed*g.speed + 0.0016*per;
+      const maintenance = 0.022*g.size*g.size + 0.030 +
+        .022*g.immunity + .012*g.camouflage + thermalStress*.05;
+      const cost = P.costMul * crowd * METABOLIC_SCALE * (
+        work / g.metabolism + METABOLIC_LOAD * maintenance * g.metabolism
+      ) + zoneCost;
       c.energy -= cost;
       c.age++;
       if(c.flash>0) c.flash--;
       c.wobble += 0.06 + g.speed*0.03;
 
       if(c.energy <= 0){ c.alive=false; c.dead='starve'; }
-      else if(c.age > 2400 + g.size*260){ c.alive=false; c.dead='age'; }
+      else if(c.age > this.lifespanTicks(g)){ c.alive=false; c.dead='age'; }
     }
 
     // remove eaten food
@@ -453,23 +926,62 @@ class World {
       this.food = nf;
     }
 
-    // reproduction
-    const babies = [];
+    // reproduction — xác định ai đủ điều kiện trước, rồi mới chia sức chứa còn
+    // lại. Trước đây vòng lặp `break` khi chạm trần, nên khi quần thể đầy chỉ
+    // những cá thể ở đầu mảng mới được sinh sản: chọn lọc theo chỉ số mảng.
+    let aliveCount = 0;
+    for(let i=0;i<cs.length;i++) if(cs[i].alive) aliveCount++;
+    // Lưới dựng lại ở cuối nhịp vì cá thể đã di chuyển từ đầu nhịp tới giờ.
+    const mateGrid = P.sexual ? this.buildGrid(cs, 48) : null;
+    const mates = P.sexual ? new Map() : null;
+    const eligible = [];
     for(let i=0;i<cs.length;i++){
       const c = cs[i];
-      if(!c.alive || c.eaten < 2 || c.energy < 70) continue;
-      if(cs.length + babies.length >= HARD_CAP) break;
+      if(!c.alive) continue;
+      const requirement=this.reproductionRequirement(c);
+      if(c.eaten < requirement.food || c.energy < requirement.energy) continue;
+      if(P.sexual){
+        // Không tìm được bạn tình thì chưa sinh sản, và cũng không tiêu tốn gì:
+        // quần thể thưa sẽ tự sinh ra hiệu ứng Allee.
+        const mate = this.findMate(i, cs, mateGrid, buf);
+        if(mate<0) continue;
+        mates.set(i, mate);
+      }
+      eligible.push(i);
+    }
+    const capacity = Math.max(0, HARD_CAP - aliveCount);
+    if(eligible.length > capacity){
+      // rút thăm không hoàn lại: mọi cá thể đủ điều kiện có cơ hội như nhau
+      for(let i=0;i<capacity;i++){
+        const j = i + Math.floor(this.rand()*(eligible.length-i));
+        const swap = eligible[i]; eligible[i]=eligible[j]; eligible[j]=swap;
+      }
+      eligible.length = capacity;
+    }
+    const babies = [];
+    for(let k=0;k<eligible.length;k++){
+      const index = eligible[k];
+      const c = cs[index];
+      const requirement=this.reproductionRequirement(c);
+      const partner = mates ? cs[mates.get(index)] : null;
       c.eaten = 0;
-      c.energy -= 58;
+      c.energy -= requirement.cost;
       const child = new Creature(
         this.nextId++,
         clamp(c.x + this.rr(-12,12), 6, this.W-6),
         clamp(c.y + this.rr(-12,12), 6, this.H-6),
-        this.mutate(c.genes),
-        50, this.day, c.gen+1
+        partner ? this.mutate(this.recombine(c.genes, partner.genes)) : this.mutate(c.genes),
+        requirement.childEnergy, this.day, c.gen+1
       );
+      // Dòng dõi truyền theo cha mẹ mang thai, nên "dòng dõi" ở chế độ hữu tính
+      // là dòng mẹ — tương tự cách người ta lần theo mtDNA.
+      child.lineage=c.lineage;
+      child.parentId=c.id;
+      child.otherParentId=partner?partner.id:null;
       child.heading = this.rr(0, Math.PI*2);
       babies.push(child);
+      c.offspring++;
+      c.offspringToday++;
       this.births++;
       if(child.gen > this.maxGen) this.maxGen = child.gen;
     }
@@ -477,7 +989,14 @@ class World {
     // sweep dead
     const alive = [];
     for(let i=0;i<cs.length;i++){
-      if(cs[i].alive) alive.push(cs[i]); else this.deaths++;
+      if(cs[i].alive) alive.push(cs[i]);
+      else {
+        this.deaths++;
+        const cause=cs[i].dead || 'starve';
+        this.deathCauses[cause]=(this.deathCauses[cause]||0)+1;
+        this.completedLives.count++;
+        this.completedLives.offspring+=cs[i].offspring;
+      }
     }
     for(let i=0;i<babies.length;i++) alive.push(babies[i]);
     this.creatures = alive;
@@ -486,9 +1005,39 @@ class World {
     this.tick++;
     if(this.tick % TICKS_PER_DAY === 0){
       this.day++;
-      this.spawnFood(Math.round(this.params.foodPerDay));
+      this.applyDayDynamics();
+      this.spawnFood(Math.round(this.params.foodPerDay*this.environment.resourceIndex));
       this.record();
     }
+  }
+  // Tìm bạn tình trong bán kính cảm nhận. Dùng chính giác quan để tìm nhau,
+  // nên ở chế độ hữu tính gene cảm nhận mang thêm một giá trị mới.
+  findMate(index, cs, grid, buf){
+    const c = cs[index];
+    const radius = c.genes.perception;
+    this.query(grid, c.x, c.y, radius, buf);
+    let best=-1, bestDistance=Infinity;
+    for(let k=0;k<buf.length;k++){
+      const oi = buf[k];
+      if(oi===index) continue;
+      const o = cs[oi];
+      if(!o.alive) continue;
+      if(o.energy < o.maxEnergy*0.4) continue;
+      const d = (o.x-c.x)*(o.x-c.x) + (o.y-c.y)*(o.y-c.y);
+      if(d < bestDistance && d < radius*radius){ bestDistance=d; best=oi; }
+    }
+    return best;
+  }
+  // Tái tổ hợp: mỗi gene được rút độc lập từ một trong hai cha mẹ (phân ly tự
+  // do của bảy locus không liên kết). Nhờ vậy con có thể mang tốc độ của cha và
+  // cảm nhận của mẹ — điều mà nhân bản có đột biến không bao giờ tạo ra được.
+  recombine(a, b){
+    const child = {};
+    for(let i=0;i<GENE_KEYS.length;i++){
+      const key = GENE_KEYS[i];
+      child[key] = this.rand()<0.5 ? a[key] : b[key];
+    }
+    return child;
   }
   mutate(g){
     const m = this.params.mutation;
@@ -496,295 +1045,1106 @@ class World {
     return {
       speed:      clamp(jit(g.speed),      RANGE.speed[0],      RANGE.speed[1]),
       size:       clamp(jit(g.size),       RANGE.size[0],       RANGE.size[1]),
-      perception: clamp(jit(g.perception), RANGE.perception[0], RANGE.perception[1])
+      perception: clamp(jit(g.perception), RANGE.perception[0], RANGE.perception[1]),
+      metabolism: clamp(jit(g.metabolism), RANGE.metabolism[0], RANGE.metabolism[1]),
+      immunity:   clamp(jit(g.immunity),   RANGE.immunity[0],   RANGE.immunity[1]),
+      camouflage: clamp(jit(g.camouflage), RANGE.camouflage[0], RANGE.camouflage[1]),
+      fecundity:  clamp(jit(g.fecundity),  RANGE.fecundity[0],  RANGE.fecundity[1])
     };
   }
   record(){
+    // chốt cửa sổ đo của ngày vừa qua TRƯỚC khi lấy số liệu, rồi mới xoá bộ đếm
+    this.lastSelection = this.selectionDifferentials();
     const s = this.stats();
-    this.history.push({ day:this.day, pop:s.pop, food:this.food.length,
-      speed:s.speed, size:s.size, perception:s.perception });
+    const r = this.researchMetrics();
+    this.history.push({
+      day:this.day, pop:s.pop, food:this.food.length,
+      // cả bảy gene đều được ghi lại, không chỉ ba gene đầu
+      speed:s.speed, size:s.size, perception:s.perception,
+      metabolism:s.metabolism, immunity:s.immunity,
+      camouflage:s.camouflage, fecundity:s.fecundity,
+      diversity:r.geneticDiversity,
+      meanOffspring:r.meanOffspring,
+      energy:r.meanEnergy,
+      effectiveLineages:r.effectiveLineages,
+      lineages:r.lineages,
+      differentiation:r.differentiation ? r.differentiation.mean : null,
+      selection:{...this.lastSelection}
+    });
     if(this.history.length > 600) this.history.shift();
+    for(const c of this.creatures) c.offspringToday=0;
   }
   stats(){
     const n = this.creatures.length;
-    if(!n) return { pop:0, speed:0, size:0, perception:0 };
-    let a=0,b=0,c=0;
-    for(let i=0;i<n;i++){ const g=this.creatures[i].genes; a+=g.speed; b+=g.size; c+=g.perception; }
-    return { pop:n, speed:a/n, size:b/n, perception:c/n };
+    if(!n) return { pop:0, speed:0, size:0, perception:0, metabolism:0, immunity:0, camouflage:0, fecundity:0 };
+    let a=0,b=0,c=0,d=0,e=0,f=0,h=0;
+    for(let i=0;i<n;i++){
+      const g=this.creatures[i].genes;
+      a+=g.speed; b+=g.size; c+=g.perception; d+=g.metabolism;
+      e+=g.immunity; f+=g.camouflage; h+=g.fecundity;
+    }
+    return {
+      pop:n, speed:a/n, size:b/n, perception:c/n, metabolism:d/n,
+      immunity:e/n, camouflage:f/n, fecundity:h/n
+    };
+  }
+  researchMetrics(){
+    const genes=['speed','size','perception','metabolism','immunity','camouflage','fecundity'];
+    const n=this.creatures.length;
+    const geneVariance={};
+    let diversity=0, meanEnergy=0;
+    for(const key of genes){
+      let mean=0;
+      for(const c of this.creatures) mean+=c.genes[key];
+      mean=n ? mean/n : 0;
+      let variance=0;
+      for(const c of this.creatures){
+        const d=c.genes[key]-mean;
+        variance+=d*d;
+      }
+      variance=n ? variance/n : 0;
+      geneVariance[key]=variance;
+      const span=RANGE[key][1]-RANGE[key][0];
+      diversity+=span ? Math.sqrt(variance)/span : 0;
+    }
+    const lineages=new Map();
+    for(const c of this.creatures){
+      meanEnergy+=c.energy;
+      lineages.set(c.lineage,(lineages.get(c.lineage)||0)+1);
+    }
+    let concentration=0;
+    if(n) for(const count of lineages.values()) concentration+=(count/n)*(count/n);
+    return {
+      day:this.day,
+      population:n,
+      geneticDiversity:diversity/genes.length,
+      // Thành công sinh sản trọn đời: số con trung bình của những cá thể đã
+      // chết, tức đã sống hết đời. Thay cho công thức fitness tự đặt trước đây.
+      meanOffspring:this.completedLives.count
+        ? this.completedLives.offspring/this.completedLives.count : 0,
+      completedLives:this.completedLives.count,
+      // Nghịch đảo chỉ số Simpson trên dòng dõi. Đây là SỐ DÒNG DÕI hiệu dụng,
+      // không phải kích thước quần thể hiệu dụng Ne của di truyền quần thể.
+      effectiveLineages:concentration ? 1/concentration : 0,
+      meanEnergy:n ? meanEnergy/n : 0,
+      // null khi kịch bản không có tiểu quần thể tách biệt để so sánh
+      differentiation:this.differentiation(),
+      // chốt theo ngày: đo trên trọn một ngày, không phải phần dở dang
+      selectionDifferential:{...this.lastSelection},
+      geneVariance,
+      deathCauses:{...this.deathCauses},
+      lineages:lineages.size,
+      births:this.births,
+      deaths:this.deaths
+    };
+  }
+  // Chênh lệch chọn lọc theo đồng nhất thức Robertson–Price: S = Cov(w, z)/w̄,
+  // với w là số con sinh trong ngày. Đây là chọn lọc qua sinh sản, đo trên các
+  // cá thể còn sống tại thời điểm đo; nó không bao gồm chọn lọc qua sống sót.
+  // Tiểu quần thể địa lý. Chỉ kịch bản có rào cách ly mới thật sự tách đôi.
+  subpopulations(){
+    const islands=this.zones.filter(zone=>zone.type==='island-a'||zone.type==='island-b');
+    if(islands.length<2) return null;
+    const groups=islands.map(()=>[]);
+    for(const c of this.creatures){
+      for(let i=0;i<islands.length;i++){
+        const zone=islands[i];
+        if(c.x>=zone.x && c.x<=zone.x+zone.w){ groups[i].push(c); break; }
+      }
+    }
+    return groups;
+  }
+  // Q_ST — phân hoá tính trạng số lượng giữa các tiểu quần thể:
+  //   Q_ST = σ²giữa / (σ²giữa + 2σ²trong)
+  // Đây là tương đương của F_ST cho tính trạng liên tục. Gọi thẳng là F_ST sẽ
+  // sai, vì F_ST được định nghĩa trên tần số allele — thứ mô hình này không có.
+  // 0 = hai đảo không khác gì nhau; tiến tới 1 = hai nhánh tách hẳn.
+  differentiation(){
+    const groups=this.subpopulations();
+    if(!groups || groups.length<2) return null;
+    if(groups.some(group=>group.length<2)) return null;
+    const genes=['speed','size','perception','metabolism','immunity','camouflage','fecundity'];
+    const perGene={};
+    let total=0;
+    for(const key of genes){
+      const means=[];
+      let within=0;
+      for(const group of groups){
+        let mean=0;
+        for(const c of group) mean+=c.genes[key];
+        mean/=group.length;
+        means.push(mean);
+        let variance=0;
+        for(const c of group){ const d=c.genes[key]-mean; variance+=d*d; }
+        within+=variance/group.length;
+      }
+      within/=groups.length;
+      let grand=0;
+      for(const mean of means) grand+=mean;
+      grand/=means.length;
+      let between=0;
+      for(const mean of means){ const d=mean-grand; between+=d*d; }
+      between/=means.length;
+      const denominator=between+2*within;
+      perGene[key]=denominator>0 ? between/denominator : 0;
+      total+=perGene[key];
+    }
+    return { perGene, mean:total/genes.length, sizes:groups.map(group=>group.length) };
+  }
+  zeroSelection(){
+    const out={};
+    for(const key of ['speed','size','perception','metabolism','immunity','camouflage','fecundity']) out[key]=0;
+    return out;
+  }
+  selectionDifferentials(){
+    const genes=['speed','size','perception','metabolism','immunity','camouflage','fecundity'];
+    const out={};
+    const n=this.creatures.length;
+    if(!n){ for(const key of genes) out[key]=0; return out; }
+    let meanW=0;
+    for(const c of this.creatures) meanW+=c.offspringToday;
+    meanW/=n;
+    for(const key of genes){
+      if(meanW<=0){ out[key]=0; continue; }
+      let meanZ=0;
+      for(const c of this.creatures) meanZ+=c.genes[key];
+      meanZ/=n;
+      let cov=0;
+      for(const c of this.creatures) cov+=(c.offspringToday-meanW)*(c.genes[key]-meanZ);
+      out[key]=cov/n/meanW;
+    }
+    return out;
+  }
+  scientificConclusion(){
+    const r=this.researchMetrics();
+    const scenario=SCENARIOS[this.scenarioId];
+    const first=this.history[0];
+    const trend=!first ? 'chưa đủ dữ liệu' :
+      r.population>first.pop*1.15 ? 'đang mở rộng' :
+      r.population<first.pop*.85 ? 'đang suy giảm' : 'đang gần trạng thái cân bằng';
+    const geneNames={
+      speed:'tốc độ',size:'kích thước',perception:'cảm nhận',
+      metabolism:'trao đổi chất',immunity:'miễn dịch',
+      camouflage:'ngụy trang',fecundity:'sinh sản'
+    };
+    let variable='speed';
+    for(const key of Object.keys(r.geneVariance)){
+      if(r.geneVariance[key]>r.geneVariance[variable]) variable=key;
+    }
+    let divergence='';
+    if(r.differentiation){
+      const q=r.differentiation.mean;
+      let split='chưa tách nhánh';
+      for(const key of Object.keys(r.differentiation.perGene)){
+        if(r.differentiation.perGene[key]>0.15) split='đang tách nhánh';
+      }
+      divergence=` Phân hoá giữa hai đảo Q_ST=${q.toFixed(3)} (${r.differentiation.sizes.join(' vs ')} cá thể) — ${split}.`;
+    }
+    return `${scenario.name}: quần thể ${trend} ở ngày ${this.day}. `+
+      `Đa dạng di truyền ${r.geneticDiversity.toFixed(3)}, số dòng dõi hiệu dụng ${r.effectiveLineages.toFixed(1)}. `+
+      `Gene biến thiên mạnh nhất là ${geneNames[variable]}; dữ liệu hiện tại ${scenario.hypothesis.toLowerCase()}`+divergence;
   }
 }
+// Kết quả cuối của một bản chạy, rút gọn thành các số vô hướng để gộp thống kê.
+const REPLICATE_FIELDS = [
+  ['population','Quần thể',0],
+  ['geneticDiversity','Đa dạng di truyền',3],
+  ['effectiveLineages','Dòng dõi hiệu dụng',1],
+  ['meanOffspring','Số con trọn đời',2],
+  ['differentiation','Phân hoá Q_ST',3],
+  ['speed','Tốc độ',2],
+  ['size','Kích thước',2],
+  ['perception','Cảm nhận',0],
+  ['metabolism','Trao đổi chất',2],
+  ['immunity','Miễn dịch',2],
+  ['camouflage','Ngụy trang',2],
+  ['fecundity','Sinh sản',2]
+];
+// Giá trị tới hạn t hai phía ở mức 95%. Với n nhỏ, dùng z=1.96 sẽ cho khoảng
+// tin cậy hẹp hơn thực tế.
+const T95 = [12.706,4.303,3.182,2.776,2.571,2.447,2.365,2.306,2.262,2.228,
+  2.201,2.179,2.160,2.145,2.131,2.120,2.110,2.101,2.093,2.086,
+  2.080,2.074,2.069,2.064,2.060,2.056,2.052,2.048,2.045,2.042];
+function tCritical(df){
+  if(df<1) return NaN;
+  return df<=T95.length ? T95[df-1] : 1.96;
+}
+function summarize(values){
+  const clean=values.filter(v=>Number.isFinite(v));
+  const n=clean.length;
+  if(!n) return { n:0, mean:NaN, sd:NaN, ci:NaN, low:NaN, high:NaN };
+  const mean=clean.reduce((a,b)=>a+b,0)/n;
+  if(n===1) return { n, mean, sd:0, ci:NaN, low:NaN, high:NaN };
+  const variance=clean.reduce((a,b)=>a+(b-mean)*(b-mean),0)/(n-1);
+  const sd=Math.sqrt(variance);
+  const ci=tCritical(n-1)*sd/Math.sqrt(n);
+  return { n, mean, sd, ci, low:mean-ci, high:mean+ci };
+}
+// Welch: hai nhóm không giả định phương sai bằng nhau.
+function welchDifference(aValues,bValues){
+  const a=summarize(aValues), b=summarize(bValues);
+  if(a.n<2||b.n<2) return { difference:b.mean-a.mean, ci:NaN, low:NaN, high:NaN, significant:false };
+  const va=a.sd*a.sd/a.n, vb=b.sd*b.sd/b.n;
+  const se=Math.sqrt(va+vb);
+  const df=se>0 ? (va+vb)*(va+vb)/((va*va)/(a.n-1)+(vb*vb)/(b.n-1)) : 1;
+  const ci=tCritical(Math.max(1,Math.round(df)))*se;
+  const difference=b.mean-a.mean;
+  return {
+    difference, ci, df,
+    low:difference-ci, high:difference+ci,
+    significant: se>0 && (difference-ci>0 || difference+ci<0)
+  };
+}
+function replicateStudy(engineWorld){
+  const metrics=engineWorld.researchMetrics();
+  const stats=engineWorld.stats();
+  return {
+    population:metrics.population,
+    geneticDiversity:metrics.geneticDiversity,
+    effectiveLineages:metrics.effectiveLineages,
+    meanOffspring:metrics.meanOffspring,
+    // NaN khi kịch bản không có tiểu quần thể; summarize() sẽ bỏ qua và báo "—"
+    differentiation:metrics.differentiation ? metrics.differentiation.mean : NaN,
+    speed:stats.speed, size:stats.size, perception:stats.perception,
+    metabolism:stats.metabolism, immunity:stats.immunity,
+    camouflage:stats.camouflage, fecundity:stats.fecundity,
+    extinct:metrics.population===0
+  };
+}
+// Chạy nhiều bản lặp độc lập của cùng một kịch bản. Mỗi bản dùng một hạt giống
+// khác nhau: một lần chạy không đủ để phát biểu điều gì về một kịch bản.
+function runReplicates(scenario,{seed=20260728,replicates=8,days=45,sexual=false,onProgress}={}){
+  const results=[];
+  for(let i=0;i<replicates;i++){
+    const world=new World({ seed:seed+i*7919, scenario, sexual });
+    world.runTicks(TICKS_PER_DAY*days);
+    results.push(replicateStudy(world));
+    if(onProgress) onProgress(i+1,replicates);
+  }
+  return results;
+}
+function aggregateReplicates(results){
+  const table={};
+  for(const [key] of REPLICATE_FIELDS){
+    table[key]=summarize(results.map(row=>row[key]));
+  }
+  return {
+    replicates:results.length,
+    extinctions:results.filter(row=>row.extinct).length,
+    fields:table
+  };
+}
+class ComparisonStudy {
+  constructor(opts){
+    opts=opts||{};
+    this.seed=opts.seed??20260728;
+    this.a=new World({seed:this.seed,scenario:opts.scenarioA||'baseline'});
+    this.b=new World({seed:this.seed,scenario:opts.scenarioB||'scarcity'});
+  }
+  runTicks(n){
+    for(let i=0;i<n;i++){ this.a.step(); this.b.step(); }
+    return this;
+  }
+  report(){
+    const am=this.a.researchMetrics(), bm=this.b.researchMetrics();
+    const delta={};
+    for(const key of ['population','geneticDiversity','meanOffspring','effectiveLineages','meanEnergy']){
+      delta[key]=bm[key]-am[key];
+    }
+    return {
+      seed:this.seed,
+      a:{scenario:this.a.scenarioId,...am},
+      b:{scenario:this.b.scenarioId,...bm},
+      delta
+    };
+  }
+}
+function exportExperiment(world,format){
+  const data={
+    meta:{
+      title:'DARWIN LAB — Chọn lọc tự nhiên',
+      seed:world.seed,
+      scenario:world.scenarioId,
+      scenarioName:SCENARIOS[world.scenarioId].name,
+      day:world.day
+    },
+    params:{...world.params},
+    environment:{...world.environment},
+    metrics:world.researchMetrics(),
+    history:world.history.map(row=>({...row})),
+    events:world.eventLog.map(event=>({...event})),
+    creatures:world.creatures.map(c=>({
+      id:c.id,lineage:c.lineage,parentId:c.parentId,generation:c.gen,
+      age:c.age,energy:c.energy,offspring:c.offspring,genes:{...c.genes}
+    }))
+  };
+  if(format==='csv'){
+    const columns=[
+      ['day','day'],['population','pop'],['food','food'],
+      ['diversity','diversity'],['mean_offspring','meanOffspring'],
+      ['energy','energy'],['effective_lineages','effectiveLineages'],
+      ['lineages','lineages'],
+      ['speed','speed'],['size','size'],['perception','perception'],
+      ['metabolism','metabolism'],['immunity','immunity'],
+      ['camouflage','camouflage'],['fecundity','fecundity']
+    ];
+    const rows=[columns.map(column=>column[0]).join(',')];
+    for(const h of world.history){
+      rows.push(columns.map(column=>h[column[1]]??0).join(','));
+    }
+    return rows.join('\n');
+  }
+  return JSON.stringify(data,null,2);
+}
+globalThis.DarwinEngine = {
+  World, Creature, ComparisonStudy, exportExperiment,
+  SCENARIOS, RANGE, TICKS_PER_DAY, SIM_WIDTH, SIM_HEIGHT, clamp, mulberry32,
+  REPLICATE_FIELDS, summarize, welchDifference, replicateStudy,
+  runReplicates, aggregateReplicates
+};
 // ===== SIM CORE END =====
-
+</script>
+<script>
 // ================= RENDER + UI =================
-(function(){
-  const $ = (s)=>document.querySelector(s);
-  const arena = $('#arena'), actx = arena.getContext('2d');
-  let world = new World({ seed: 20260728 });
-  let running = false, speedMul = 1, selectedId = null, acc = 0, last = performance.now();
 
-  // ---------- gene colour ----------
-  const ACC = { speed:[255,126,182], size:[255,209,102], perc:[95,227,192] };
-  function norm(v,a,b){ return clamp((v-a)/(b-a), 0, 1); }
-  function geneColor(g){
-    const s = norm(g.speed, RANGE.speed[0], RANGE.speed[1]);
-    const z = norm(g.size, RANGE.size[0], RANGE.size[1]);
-    const p = norm(g.perception, RANGE.perception[0], RANGE.perception[1]);
-    const t = s+z+p || 1;
-    const r = (ACC.speed[0]*s + ACC.size[0]*z + ACC.perc[0]*p)/t;
-    const gg= (ACC.speed[1]*s + ACC.size[1]*z + ACC.perc[1]*p)/t;
-    const b = (ACC.speed[2]*s + ACC.size[2]*z + ACC.perc[2]*p)/t;
-    return [Math.round(r), Math.round(gg), Math.round(b)];
-  }
-  const rgb = (c,a)=> a===undefined ? `rgb(${c[0]},${c[1]},${c[2]})` : `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+(function researchUI(){
+  const $=(selector)=>document.querySelector(selector);
+  const $$=(selector)=>[...document.querySelectorAll(selector)];
+  const arena=$('#arena');
+  const ctx=arena.getContext('2d');
+  const GENE_KEYS=['speed','size','perception','metabolism','immunity','camouflage','fecundity'];
+  const GENE_UI={
+    speed:['Tốc độ','#ff7eb6','gSpeed','mSpeed'],
+    size:['Kích thước','#ffd166','gSize','mSize'],
+    perception:['Cảm nhận','#5fe3c0','gPerc','mPerc'],
+    metabolism:['Trao đổi chất','#7aa7ff','gMetabolism','mMetabolism'],
+    immunity:['Miễn dịch','#b997ff','gImmunity','mImmunity'],
+    camouflage:['Ngụy trang','#8ed081','gCamouflage','mCamouflage'],
+    fecundity:['Sinh sản','#ff9f68','gFecundity','mFecundity']
+  };
+  const ZONE_COLORS={
+    nutrient:'rgba(92,169,105,.16)',drought:'rgba(204,151,65,.18)',
+    shelter:'rgba(41,94,69,.20)',thermal:'rgba(75,133,210,.13)',
+    disease:'rgba(154,91,184,.15)',barrier:'rgba(35,39,47,.78)',
+    'island-a':'rgba(78,143,101,.08)','island-b':'rgba(90,122,180,.08)',
+    toxin:'rgba(213,79,79,.12)',ash:'rgba(70,73,80,.27)'
+  };
+  const ZONE_NAMES={
+    nutrient:'Dinh dưỡng',drought:'Khô hạn',shelter:'Nơi trú ẩn',
+    thermal:'Nhiệt độ',disease:'Ổ dịch',barrier:'Rào cách ly',
+    'island-a':'Đảo A','island-b':'Đảo B',toxin:'Độc tố',ash:'Tro bụi'
+  };
+  let scenarioA='baseline';
+  let scenarioB='scarcity';
+  let compareMode=false;
+  // Chế độ sinh sản là biến của cả nghiên cứu: đổi thì cả A và B cùng đổi, nếu
+  // không thì A/B lại bị nhiễu đúng kiểu đã sửa ở phần tham số môi trường.
+  let sexualMode=false;
+  let seed=20260728;
+  let world=new World({seed,scenario:scenarioA});
+  let worldB=null;
+  let running=false;
+  let speedMul=1;
+  let selectedId=null;
+  let acc=0;
+  let last=performance.now();
+  let toastTimer=0;
+  let rateSteps=0;
+  let rateSince=performance.now();
 
-  // ---------- crisp canvas ----------
-  function fit(cv){
-    const dpr = window.devicePixelRatio || 1;
-    const r = cv.getBoundingClientRect();
-    const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
-    if(cv.width !== Math.round(w*dpr) || cv.height !== Math.round(h*dpr)){
-      cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  function fit(canvas){
+    const dpr=window.devicePixelRatio||1;
+    const rect=canvas.getBoundingClientRect();
+    const width=Math.max(1,Math.round(rect.width));
+    const height=Math.max(1,Math.round(rect.height));
+    if(canvas.width!==Math.round(width*dpr)||canvas.height!==Math.round(height*dpr)){
+      canvas.width=Math.round(width*dpr);
+      canvas.height=Math.round(height*dpr);
     }
-    const ctx = cv.getContext('2d');
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    return { w, h, ctx };
+    const context=canvas.getContext('2d');
+    context.setTransform(dpr,0,0,dpr,0,0);
+    return {width,height,context};
   }
+
+  // Khung nhìn: chiếu sân mô phỏng cố định (SIM_WIDTH x SIM_HEIGHT) vào một ô
+  // trên canvas, giữ nguyên tỷ lệ. Thế giới không bao giờ đổi kích thước, nên
+  // cùng một hạt giống luôn cho cùng một kết quả.
+  function viewport(paneX,paneWidth,paneHeight){
+    const scale=Math.min(paneWidth/SIM_WIDTH,paneHeight/SIM_HEIGHT);
+    return {
+      scale,
+      ox:paneX+(paneWidth-SIM_WIDTH*scale)/2,
+      oy:(paneHeight-SIM_HEIGHT*scale)/2
+    };
+  }
+
+  function paneViews(width,height){
+    if(compareMode&&worldB){
+      const half=Math.floor(width/2);
+      return {a:viewport(0,half-1,height),b:viewport(half+1,width-half-1,height),half};
+    }
+    return {a:viewport(0,width,height),b:null,half:0};
+  }
+
   function resizeArena(){
-    const { w, h } = fit(arena);
-    world.W = w; world.H = h;
-    for(const c of world.creatures){ c.x = clamp(c.x, 6, w-6); c.y = clamp(c.y, 6, h-6); }
-    for(const f of world.food){ f.x = clamp(f.x, 6, w-6); f.y = clamp(f.y, 6, h-6); }
+    fit(arena);
   }
-  const ro = new ResizeObserver(()=>{ resizeArena(); draw(); });
-  ro.observe(arena.parentElement);
-  window.addEventListener('resize', ()=>{ resizeArena(); });
 
-  // ---------- draw arena ----------
-  function draw(){
-    const { w, h, ctx } = fit(arena);
-    ctx.clearRect(0,0,w,h);
-    // floor with soft pseudo-3D falloff
-    const bg = ctx.createLinearGradient(0,0,0,h);
-    bg.addColorStop(0,'#f7f4ec'); bg.addColorStop(1,'#e3ddcd');
-    ctx.fillStyle = bg; ctx.fillRect(0,0,w,h);
-    ctx.strokeStyle = 'rgba(90,80,60,.07)'; ctx.lineWidth = 1;
-    const gs = 56;
-    ctx.beginPath();
-    for(let x=gs; x<w; x+=gs){ ctx.moveTo(x+.5,0); ctx.lineTo(x+.5,h); }
-    for(let y=gs; y<h; y+=gs){ ctx.moveTo(0,y+.5); ctx.lineTo(w,y+.5); }
-    ctx.stroke();
-    const vg = ctx.createRadialGradient(w/2,h/2,Math.min(w,h)*0.25, w/2,h/2, Math.max(w,h)*0.72);
-    vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(40,32,18,.16)');
-    ctx.fillStyle = vg; ctx.fillRect(0,0,w,h);
+  function normalized(value,key){
+    const range=RANGE[key];
+    return clamp((value-range[0])/(range[1]-range[0]),0,1);
+  }
 
-    // food
-    ctx.fillStyle = '#5c8f5a';
-    for(const f of world.food){
-      ctx.beginPath(); ctx.ellipse(f.x, f.y, 2.6, 2.2, 0, 0, 6.2832); ctx.fill();
+  function geneColor(genes){
+    const speed=normalized(genes.speed,'speed');
+    const size=normalized(genes.size,'size');
+    const perception=normalized(genes.perception,'perception');
+    const total=speed+size+perception||1;
+    const colors=[[255,126,182],[255,209,102],[95,227,192]];
+    const values=[speed,size,perception];
+    return colors[0].map((_,channel)=>Math.round(
+      colors.reduce((sum,color,index)=>sum+color[channel]*values[index],0)/total
+    ));
+  }
+
+  function drawFloor(context,width,height){
+    const floor=context.createLinearGradient(0,0,0,height);
+    floor.addColorStop(0,'#f8f5ed');
+    floor.addColorStop(1,'#dfd7c5');
+    context.fillStyle=floor;
+    context.fillRect(0,0,width,height);
+    context.strokeStyle='rgba(84,72,52,.075)';
+    context.lineWidth=1;
+    context.beginPath();
+    for(let x=48;x<width;x+=48){context.moveTo(x+.5,0);context.lineTo(x+.5,height);}
+    for(let y=48;y<height;y+=48){context.moveTo(0,y+.5);context.lineTo(width,y+.5);}
+    context.stroke();
+  }
+
+  function drawWorld(target,view,label,isPrimary){
+    const width=SIM_WIDTH,height=SIM_HEIGHT;
+    ctx.save();
+    ctx.translate(view.ox,view.oy);
+    ctx.scale(view.scale,view.scale);
+    ctx.beginPath();ctx.rect(0,0,width,height);ctx.clip();
+    drawFloor(ctx,width,height);
+
+    for(const zone of target.zones){
+      ctx.fillStyle=ZONE_COLORS[zone.type]||'rgba(60,60,60,.08)';
+      ctx.fillRect(zone.x,zone.y,zone.w,zone.h);
+      if(zone.type==='barrier'){
+        ctx.strokeStyle='rgba(255,255,255,.11)';
+        ctx.setLineDash([4,5]);
+        ctx.strokeRect(zone.x+.5,zone.y+.5,zone.w-1,zone.h-1);
+        ctx.setLineDash([]);
+      }
     }
 
-    // selected perception ring
-    const sel = selectedId!==null ? world.creatures.find(c=>c.id===selectedId) : null;
-    if(sel){
-      ctx.beginPath(); ctx.ellipse(sel.x, sel.y, sel.genes.perception, sel.genes.perception*0.86, 0,0,6.2832);
-      ctx.fillStyle = 'rgba(95,227,192,.10)'; ctx.fill();
-      ctx.strokeStyle = 'rgba(30,120,100,.55)'; ctx.setLineDash([5,5]); ctx.lineWidth=1.4; ctx.stroke();
+    if(target.params.climate){
+      const tint=target.environment.temperature>22 ?
+        `rgba(255,112,67,${Math.min(.12,(target.environment.temperature-22)/100)})` :
+        `rgba(71,132,214,${Math.min(.14,(22-target.environment.temperature)/90)})`;
+      ctx.fillStyle=tint;ctx.fillRect(0,0,width,height);
+    }
+    if(target.environment.shock>.01){
+      ctx.fillStyle=`rgba(38,39,43,${target.environment.shock*.24})`;
+      ctx.fillRect(0,0,width,height);
+    }
+
+    ctx.fillStyle='#5c8f5a';
+    for(const food of target.food){
+      ctx.beginPath();ctx.arc(food.x,food.y,2.45,0,Math.PI*2);ctx.fill();
+    }
+
+    const selected=isPrimary&&selectedId!==null ?
+      target.creatures.find(creature=>creature.id===selectedId):null;
+    if(selected){
+      ctx.beginPath();
+      ctx.arc(selected.x,selected.y,selected.genes.perception,0,Math.PI*2);
+      ctx.fillStyle='rgba(95,227,192,.075)';ctx.fill();
+      ctx.strokeStyle='rgba(36,123,104,.5)';ctx.setLineDash([5,5]);ctx.stroke();
       ctx.setLineDash([]);
     }
 
-    // creatures
-    for(const c of world.creatures){
-      const r = c.radius, col = geneColor(c.genes);
-      const wob = Math.sin(c.wobble)*r*0.07;
-      // shadow
-      ctx.fillStyle = 'rgba(60,50,30,.16)';
-      ctx.beginPath(); ctx.ellipse(c.x+2, c.y+r*0.72, r*0.92, r*0.34, 0,0,6.2832); ctx.fill();
-      // body
-      ctx.fillStyle = rgb(col);
-      ctx.beginPath(); ctx.ellipse(c.x, c.y, r+wob, (r-wob)*0.86, 0,0,6.2832); ctx.fill();
-      // top light
-      ctx.fillStyle = 'rgba(255,255,255,.22)';
-      ctx.beginPath(); ctx.ellipse(c.x, c.y-r*0.26, (r+wob)*0.7, r*0.34, 0,0,6.2832); ctx.fill();
-      if(c.flash>0){
-        ctx.strokeStyle = 'rgba(255,255,255,'+(c.flash/16)+')'; ctx.lineWidth=2;
-        ctx.beginPath(); ctx.ellipse(c.x,c.y,r+3,(r+3)*0.86,0,0,6.2832); ctx.stroke();
+    for(const creature of target.creatures){
+      const radius=creature.radius;
+      const color=geneColor(creature.genes);
+      const camouflage=creature.genes.camouflage;
+      const wobble=Math.sin(creature.wobble)*radius*.06;
+      ctx.fillStyle='rgba(55,46,30,.14)';
+      ctx.beginPath();ctx.ellipse(creature.x+2,creature.y+radius*.72,radius*.9,radius*.32,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=`rgb(${color[0]},${color[1]},${color[2]})`;
+      ctx.globalAlpha=.82+camouflage*.18;
+      ctx.beginPath();ctx.ellipse(creature.x,creature.y,radius+wobble,(radius-wobble)*.86,0,0,Math.PI*2);ctx.fill();
+      ctx.globalAlpha=1;
+      ctx.fillStyle='rgba(255,255,255,.2)';
+      ctx.beginPath();ctx.ellipse(creature.x,creature.y-radius*.25,radius*.68,radius*.3,0,0,Math.PI*2);ctx.fill();
+      if(selected&&selected.id===creature.id){
+        ctx.strokeStyle='#173c32';ctx.lineWidth=2;
+        ctx.beginPath();ctx.ellipse(creature.x,creature.y,radius+4,(radius+4)*.86,0,0,Math.PI*2);ctx.stroke();
       }
-      if(sel && sel.id===c.id){
-        ctx.strokeStyle = '#12241f'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.ellipse(c.x,c.y,r+4,(r+4)*0.86,0,0,6.2832); ctx.stroke();
-      }
-      // eyes
-      const ex = Math.cos(c.heading), ey = Math.sin(c.heading)*0.7;
-      const off = r*0.36, er = Math.max(1.6, r*0.21);
-      for(const s of [-1,1]){
-        const px = c.x + ex*r*0.30 - ey*off*s, py = c.y + ey*r*0.30 + ex*off*s*0.72 - r*0.10;
-        ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(px,py,er,0,6.2832); ctx.fill();
-        ctx.fillStyle='#1b1f26'; ctx.beginPath(); ctx.arc(px+ex*er*0.42, py+ey*er*0.42, er*0.52,0,6.2832); ctx.fill();
+      const ex=Math.cos(creature.heading),ey=Math.sin(creature.heading)*.7;
+      const eyeRadius=Math.max(1.5,radius*.2);
+      for(const side of [-1,1]){
+        const px=creature.x+ex*radius*.28-ey*radius*.34*side;
+        const py=creature.y+ey*radius*.28+ex*radius*.25*side-radius*.08;
+        ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(px,py,eyeRadius,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#172027';ctx.beginPath();ctx.arc(px+ex*eyeRadius*.38,py+ey*eyeRadius*.38,eyeRadius*.52,0,Math.PI*2);ctx.fill();
       }
     }
-    if(world.creatures.length===0){
-      ctx.fillStyle='rgba(40,34,22,.55)';
-      ctx.font='600 15px "Space Grotesk",system-ui,sans-serif';
-      ctx.textAlign='center';
-      ctx.fillText('Quần thể đã tuyệt chủng. Đổi tham số rồi Đặt lại để chạy lại cùng thí nghiệm.', w/2, h/2);
+
+    ctx.restore();
+
+    // Nhãn vẽ ngoài phép biến đổi để chữ không bị co giãn theo cửa sổ.
+    ctx.save();
+    ctx.translate(view.ox,view.oy);
+    ctx.fillStyle='rgba(35,31,24,.62)';
+    ctx.font='600 10px ui-monospace,monospace';
+    ctx.fillText(label,12,18);
+    if(target.creatures.length===0){
+      ctx.font='600 14px system-ui,sans-serif';ctx.textAlign='center';
+      ctx.fillText('QUẦN THỂ TUYỆT CHỦNG',width*view.scale/2,height*view.scale/2);
       ctx.textAlign='start';
     }
+    ctx.restore();
   }
 
-  // ---------- charts ----------
-  function drawPop(){
-    const { w, h, ctx } = fit($('#chPop'));
-    ctx.clearRect(0,0,w,h);
-    const H = world.history;
-    ctx.strokeStyle='rgba(255,255,255,.07)'; ctx.lineWidth=1;
-    for(let i=1;i<4;i++){ const y=Math.round(h*i/4)+.5; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
-    if(H.length<2) return;
-    let maxP = 10, maxF = 10;
-    for(const d of H){ if(d.pop>maxP) maxP=d.pop; if(d.food>maxF) maxF=d.food; }
-    const X = i => (i/(H.length-1))*w;
-    // food (faint)
-    ctx.beginPath();
-    H.forEach((d,i)=>{ const y=h-(d.food/maxF)*(h-8)-4; i?ctx.lineTo(X(i),y):ctx.moveTo(X(i),y); });
-    ctx.strokeStyle='rgba(255,209,102,.28)'; ctx.lineWidth=1.4; ctx.stroke();
-    // population fill + line
-    ctx.beginPath();
-    H.forEach((d,i)=>{ const y=h-(d.pop/maxP)*(h-8)-4; i?ctx.lineTo(X(i),y):ctx.moveTo(X(i),y); });
-    ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath();
-    const g = ctx.createLinearGradient(0,0,0,h);
-    g.addColorStop(0,'rgba(95,227,192,.30)'); g.addColorStop(1,'rgba(95,227,192,0)');
-    ctx.fillStyle=g; ctx.fill();
-    ctx.beginPath();
-    H.forEach((d,i)=>{ const y=h-(d.pop/maxP)*(h-8)-4; i?ctx.lineTo(X(i),y):ctx.moveTo(X(i),y); });
-    ctx.strokeStyle='#5fe3c0'; ctx.lineWidth=1.8; ctx.stroke();
-    ctx.fillStyle='rgba(255,255,255,.42)'; ctx.font='10px ui-monospace,monospace';
-    ctx.fillText(String(maxP), 4, 11);
-  }
-  function drawHist(id, key, range, color){
-    const { w, h, ctx } = fit($(id));
-    ctx.clearRect(0,0,w,h);
-    const BINS = 26, bins = new Array(BINS).fill(0);
-    for(const c of world.creatures){
-      const t = norm(c.genes[key], range[0], range[1]);
-      bins[Math.min(BINS-1, Math.floor(t*BINS))]++;
+  function draw(){
+    const {width,height}=fit(arena);
+    ctx.clearRect(0,0,width,height);
+    const views=paneViews(width,height);
+    if(views.b){
+      drawWorld(world,views.a,'A · '+SCENARIOS[scenarioA].name,true);
+      drawWorld(worldB,views.b,'B · '+SCENARIOS[scenarioB].name,false);
+      ctx.fillStyle='rgba(16,18,22,.9)';ctx.fillRect(views.half-1,0,3,height);
+    }else{
+      drawWorld(world,views.a,SCENARIOS[scenarioA].name,true);
     }
-    const max = Math.max(1, ...bins);
-    const bw = w/BINS;
-    for(let i=0;i<BINS;i++){
-      const bh = (bins[i]/max)*(h-6);
-      const a = 0.30 + 0.70*(i/(BINS-1));
-      ctx.fillStyle = color.replace('ALPHA', a.toFixed(2));
-      ctx.fillRect(i*bw+0.6, h-bh, bw-1.2, bh);
-    }
-    ctx.strokeStyle='rgba(255,255,255,.10)'; ctx.beginPath();
-    ctx.moveTo(0,h-.5); ctx.lineTo(w,h-.5); ctx.stroke();
   }
 
-  // ---------- HUD ----------
-  function hud(){
-    const s = world.stats();
-    $('#sPop').textContent = s.pop;
-    $('#sDay').innerHTML = world.day + '<small id="sGen">g' + world.maxGen + '</small>';
-    $('#sFood').textContent = world.food.length;
-    $('#sBD').innerHTML = world.births + '<small>/' + world.deaths + '</small>';
-    $('#dayTag').textContent = 'NGÀY ' + world.day;
-    $('#seedLbl').textContent = world.seed;
-    $('#mSpeed').textContent = s.pop ? 'TB ' + s.speed.toFixed(2) : '—';
-    $('#mSize').textContent  = s.pop ? 'TB ' + s.size.toFixed(2)  : '—';
-    $('#mPerc').textContent  = s.pop ? 'TB ' + s.perception.toFixed(0) + ' px' : '—';
-    drawPop();
-    drawHist('#chSpeed','speed',RANGE.speed,'rgba(255,126,182,ALPHA)');
-    drawHist('#chSize','size',RANGE.size,'rgba(255,209,102,ALPHA)');
-    drawHist('#chPerc','perception',RANGE.perception,'rgba(95,227,192,ALPHA)');
-    selPanel();
+  function drawResearchChart(){
+    const chart=$('#researchChart');
+    const {width,height,context}=fit(chart);
+    context.clearRect(0,0,width,height);
+    context.strokeStyle='rgba(255,255,255,.07)';
+    for(let i=1;i<4;i++){
+      const y=Math.round(height*i/4)+.5;
+      context.beginPath();context.moveTo(0,y);context.lineTo(width,y);context.stroke();
+    }
+    const histories=[world.history,compareMode&&worldB?worldB.history:null].filter(Boolean);
+    const maxPop=Math.max(10,...histories.flat().map(row=>row.pop));
+    function line(history,key,max,color){
+      if(history.length<2)return;
+      context.beginPath();
+      history.forEach((row,index)=>{
+        const x=index/(history.length-1)*width;
+        const y=height-4-(row[key]||0)/max*(height-10);
+        index?context.lineTo(x,y):context.moveTo(x,y);
+      });
+      context.strokeStyle=color;context.lineWidth=1.8;context.stroke();
+    }
+    line(world.history,'pop',maxPop,'#5fe3c0');
+    if(compareMode&&worldB)line(worldB.history,'pop',maxPop,'#ff7eb6');
+    const maxDiversity=Math.max(.03,...world.history.map(row=>row.diversity||0));
+    line(world.history,'diversity',maxDiversity,'#ffd166');
   }
-  function selPanel(){
-    const box = $('#selBox');
-    const c = selectedId!==null ? world.creatures.find(x=>x.id===selectedId) : null;
-    if(!c){
-      box.innerHTML = '<div class="sel-empty">Chưa chọn cá thể nào. Nhấp vào một khối trên sân để mở hồ sơ gene của nó.</div>';
+
+  function updateGeneMeters(stats,selection){
+    for(const key of GENE_KEYS){
+      const [, ,fillId,valueId]=GENE_UI[key];
+      const value=stats[key]||0;
+      $('#'+fillId).style.width=(normalized(value,key)*100).toFixed(1)+'%';
+      const text=key==='perception'?value.toFixed(0):value.toFixed(2);
+      // Chênh lệch chọn lọc chuẩn hoá theo dải gene, để bảy gene có thể so với nhau.
+      const range=RANGE[key];
+      const scaled=(selection&&selection[key]||0)/(range[1]-range[0]);
+      const mark=Math.abs(scaled)>0.002
+        ? `<span class="gene-sel ${scaled>0?'up':'down'}">${scaled>0?'▲':'▼'}${Math.abs(scaled*100).toFixed(1)}</span>`
+        : '';
+      $('#'+valueId).innerHTML=text+mark;
+    }
+  }
+
+  function updateEvents(){
+    const log=$('#eventLog');
+    if(!world.eventLog.length){
+      log.innerHTML='<div class="event-empty">Chưa có biến cố môi trường. Hãy chạy thêm ngày hoặc chọn một kịch bản đặc biệt.</div>';
       return;
     }
-    const col = geneColor(c.genes);
-    const days = (c.age/TICKS_PER_DAY).toFixed(2);
-    box.innerHTML =
-      '<div style="display:flex;gap:9px;align-items:center;margin-bottom:9px">' +
-        '<span class="chip"><i class="dot" style="background:'+rgb(col)+'"></i>#'+c.id+'</span>' +
-        '<span class="chip">thế hệ '+c.gen+'</span>' +
-        '<span class="chip">sinh ngày '+c.birthDay+'</span>' +
-      '</div>' +
-      kv('Tốc độ', c.genes.speed.toFixed(2), 'var(--speed)') +
-      kv('Kích thước', c.genes.size.toFixed(2), 'var(--size)') +
-      kv('Cảm nhận', c.genes.perception.toFixed(0)+' px', 'var(--perc)') +
-      kv('Năng lượng', c.energy.toFixed(0)+' / '+c.maxEnergy.toFixed(0)) +
-      kv('Tuổi', days+' ngày') +
-      kv('Đã ăn (chu kỳ này)', c.eaten+' / 2');
-  }
-  function kv(k,v,c){
-    return '<div class="kv"><span class="k">'+k+'</span><span class="v"'+(c?' style="color:'+c+'"':'')+'>'+v+'</span></div>';
+    log.innerHTML=world.eventLog.slice(0,12).map(event=>
+      `<div class="event-item"><time>NGÀY ${event.day}</time><div><b>${event.title}</b><span>${event.detail}</span></div></div>`
+    ).join('');
   }
 
-  // ---------- loop ----------
+  function updateComparison(){
+    const card=$('#comparisonCard');
+    card.hidden=!(compareMode&&worldB);
+    if(card.hidden)return;
+    const a=world.researchMetrics(),b=worldB.researchMetrics();
+    const rows=[
+      ['Quần thể',a.population,b.population],
+      ['Đa dạng',a.geneticDiversity.toFixed(3),b.geneticDiversity.toFixed(3)],
+      ['Số con trọn đời',a.meanOffspring.toFixed(2),b.meanOffspring.toFixed(2)],
+      ['Dòng dõi hiệu dụng',a.effectiveLineages.toFixed(1),b.effectiveLineages.toFixed(1)],
+      ['Năng lượng TB',a.meanEnergy.toFixed(1),b.meanEnergy.toFixed(1)]
+    ];
+    $('#comparisonTable').innerHTML=
+      '<span class="head">CHỈ SỐ</span><span class="head">A</span><span class="head">B</span>'+
+      rows.map(row=>`<span>${row[0]}</span><span class="num">${row[1]}</span><span class="num">${row[2]}</span>`).join('');
+  }
+
+  function updateZones(){
+    const types=[...new Set(world.zones.map(zone=>zone.type))];
+    $('#zoneLegend').innerHTML=types.map(type=>
+      `<span class="zone-chip" style="background:${ZONE_COLORS[type]||'transparent'}">${ZONE_NAMES[type]||type}</span>`
+    ).join('');
+  }
+
+  function updateTimeline(){
+    const timeline=$('#timeline');
+    timeline.max=Math.max(0,world.history.length-1);
+    if(!timeline.matches(':active'))timeline.value=timeline.max;
+    const row=world.history[+timeline.value]||world.history.at(-1);
+    if(!row)return;
+    $('#timelineDay').textContent='Ngày '+row.day;
+    $('#timelineInsight').textContent=
+      `Ngày ${row.day}: ${row.pop} cá thể · đa dạng ${(row.diversity||0).toFixed(3)} · số con trọn đời ${(row.meanOffspring||0).toFixed(2)} · ${row.food} thức ăn.`;
+  }
+
+  function selectedPanel(){
+    const box=$('#selBox');
+    const creature=selectedId!==null?world.creatures.find(item=>item.id===selectedId):null;
+    if(!creature){
+      box.innerHTML='<div class="sel-empty">Chưa chọn cá thể nào. Nhấp vào sinh vật trong vùng A để xem gene, dòng dõi và fitness.</div>';
+      return;
+    }
+    const entries=[
+      ['Tốc độ',creature.genes.speed.toFixed(2)],
+      ['Kích thước',creature.genes.size.toFixed(2)],
+      ['Cảm nhận',creature.genes.perception.toFixed(0)+' px'],
+      ['Trao đổi chất',creature.genes.metabolism.toFixed(2)],
+      ['Miễn dịch',(creature.genes.immunity*100).toFixed(0)+'%'],
+      ['Ngụy trang',(creature.genes.camouflage*100).toFixed(0)+'%'],
+      ['Sinh sản',creature.genes.fecundity.toFixed(2)],
+      ['Năng lượng',creature.energy.toFixed(0)+' / '+creature.maxEnergy.toFixed(0)],
+      ['Tuổi',(creature.age/TICKS_PER_DAY).toFixed(2)+' ngày'],
+      ['Con đã sinh',creature.offspring],
+      ['Dòng dõi','#'+creature.lineage]
+    ];
+    box.innerHTML=`<div style="display:flex;gap:7px;margin-bottom:8px"><span class="chip">CÁ THỂ #${creature.id}</span><span class="chip">THẾ HỆ ${creature.gen}</span></div>`+
+      entries.map(entry=>`<div class="kv"><span class="k">${entry[0]}</span><span class="v">${entry[1]}</span></div>`).join('');
+  }
+
+  function hud(){
+    const stats=world.stats();
+    const metrics=world.researchMetrics();
+    $('#sPop').textContent=stats.pop;
+    $('#sDay').innerHTML=world.day+'<small>g'+world.maxGen+'</small>';
+    $('#sFood').textContent=world.food.length;
+    $('#sBD').innerHTML=world.births+'<small>/'+world.deaths+'</small>';
+    $('#sDiversity').textContent=metrics.geneticDiversity.toFixed(3);
+    $('#sFitness').textContent=metrics.meanOffspring.toFixed(2);
+    $('#sEffective').textContent=metrics.effectiveLineages.toFixed(1);
+    $('#sTemperature').innerHTML=world.environment.temperature.toFixed(1)+'<small>°C</small>';
+    $('#sLineages').textContent=metrics.lineages;
+    $('#sDifferentiation').textContent=metrics.differentiation
+      ? metrics.differentiation.mean.toFixed(3) : '—';
+    arena.setAttribute('aria-label',
+      `${SCENARIOS[scenarioA].name}${compareMode&&worldB?' đối chứng với '+SCENARIOS[scenarioB].name:''}, `+
+      `ngày ${world.day}, ${stats.pop} cá thể, ${world.food.length} thức ăn. `+
+      `Tốc độ trung bình ${stats.speed.toFixed(2)}, kích thước ${stats.size.toFixed(2)}, `+
+      `cảm nhận ${stats.perception.toFixed(0)}. Sinh sản ${sexualMode?'hữu tính':'vô tính'}.`);
+    $('#dayTag').textContent='NGÀY '+world.day;
+    $('#seedLbl').textContent=world.seed;
+    $('#conclusion').textContent=world.scientificConclusion();
+    $('#compareTag').textContent=compareMode&&worldB?'CÙNG SEED · HAI MÔI TRƯỜNG':'';
+    updateGeneMeters(stats,metrics.selectionDifferential);
+    drawResearchChart();
+    updateEvents();
+    updateComparison();
+    updateTimeline();
+    selectedPanel();
+  }
+
+  function syncControls(){
+    const params=world.params;
+    $('#rFood').value=params.foodPerDay;$('#vFood').textContent=params.foodPerDay;
+    $('#rMut').value=Math.round(params.mutation*100);$('#vMut').textContent=Math.round(params.mutation*100)+'%';
+    $('#rCost').value=Math.round(params.costMul*100);$('#vCost').textContent=params.costMul.toFixed(2)+'x';
+    $('#chkPred').checked=!!params.predation;
+    $('#chkSexual').checked=sexualMode;
+    $('#hypothesis').textContent=SCENARIOS[scenarioA].hypothesis;
+    $$('#scenarioGrid [data-scenario]').forEach(button=>button.classList.toggle('on',button.dataset.scenario===scenarioA));
+    $('#comparePicker').hidden=!compareMode;
+    $$('#studyMode button').forEach(button=>button.classList.toggle('on',(button.dataset.mode==='compare')===compareMode));
+    syncParamLock();
+    updateZones();
+  }
+
+  // Trong chế độ đối chứng, tham số môi trường thuộc về kịch bản. Nếu cho phép
+  // chỉnh tay thì thay đổi chỉ rơi vào quần thể A và phép so sánh mất hiệu lực,
+  // nên ở đây khoá lại và hiện thẳng độ tương phản A/B.
+  function syncParamLock(){
+    const locked=compareMode&&!!worldB;
+    for(const id of ['rFood','rMut','rCost','chkPred']) $('#'+id).disabled=locked;
+    $$('.ctl').forEach(control=>control.classList.toggle('locked',locked));
+    $('#paramNote').textContent=locked
+      ? 'Chế độ đối chứng: tham số do kịch bản quy định và bị khoá, để chênh lệch giữa A và B chỉ đến từ kịch bản.'
+      : 'Ba tham số này áp dụng ngay lập tức, không cần đặt lại.';
+    const contrast=$('#paramContrast');
+    contrast.hidden=!locked;
+    if(!locked) return;
+    const describe=(target)=>
+      `thức ăn ${target.params.foodPerDay} · đột biến ${Math.round(target.params.mutation*100)}% · `+
+      `chi phí ${target.params.costMul.toFixed(2)}x · săn mồi ${target.params.predation?'bật':'tắt'}`;
+    contrast.innerHTML=
+      `<span><b>A</b>${describe(world)}</span><span><b>B</b>${describe(worldB)}</span>`;
+  }
+
+  function makeStudy(){
+    world=new World({seed,scenario:scenarioA,sexual:sexualMode});
+    worldB=compareMode?new World({seed,scenario:scenarioB,sexual:sexualMode}):null;
+    selectedId=null;
+    syncControls();
+    resizeArena();
+    draw();hud();
+  }
+
+  function applyScenario(id){
+    scenarioA=id;
+    running=false;
+    $('#btnRun').textContent='Chạy';
+    makeStudy();
+    notify('Đã nạp kịch bản: '+SCENARIOS[id].name);
+  }
+
+  function notify(message){
+    const toast=$('#toast');
+    toast.textContent=message;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>toast.classList.remove('show'),1800);
+  }
+
+  function snapshotLab(){
+    return {
+      version:2,compareMode,scenarioA,scenarioB,seed,
+      world:world.snapshot(),
+      worldB:worldB?worldB.snapshot():null
+    };
+  }
+
+  function saveExperiment(){
+    localStorage.setItem('darwin-lab-research-v2',JSON.stringify(snapshotLab()));
+    notify('Đã lưu thí nghiệm trên thiết bị');
+  }
+
+  function loadExperiment(){
+    const raw=localStorage.getItem('darwin-lab-research-v2');
+    if(!raw){notify('Chưa có thí nghiệm đã lưu');return;}
+    try{
+      const data=JSON.parse(raw);
+      compareMode=!!data.compareMode;scenarioA=data.scenarioA;scenarioB=data.scenarioB;seed=data.seed;
+      world=World.fromSnapshot(data.world);
+      worldB=data.worldB?World.fromSnapshot(data.worldB):null;
+      sexualMode=!!world.params.sexual;
+      running=false;selectedId=null;
+      syncControls();resizeArena();draw();hud();
+      notify('Đã khôi phục đúng trạng thái đã lưu');
+    }catch(error){
+      notify('Tệp lưu không hợp lệ');
+    }
+  }
+
+  function downloadExperiment(format){
+    let content=exportExperiment(world,format);
+    if(format==='json'&&lastReplicateReport){
+      const parsed=JSON.parse(content);
+      parsed.replicateStudy=lastReplicateReport;
+      content=JSON.stringify(parsed,null,2);
+    }
+    const blob=new Blob([content],{type:format==='csv'?'text/csv;charset=utf-8':'application/json;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement('a');
+    link.href=url;
+    link.download=`darwin-${scenarioA}-seed-${seed}-day-${world.day}.${format}`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    notify('Đã xuất dữ liệu '+format.toUpperCase());
+  }
+
+  // ---------- nghiên cứu lặp lại ----------
+  // Worker nạp lại chính thẻ #simCore, nên engine chạy trong luồng nền là đúng
+  // engine đang chạy trên màn hình — không có bản sao thứ hai để trôi lệch.
+  const WORKER_GLUE=`
+self.onmessage=function(event){
+  var data=event.data, E=self.DarwinEngine, out={}, total=data.scenarios.length*data.replicates, done=0;
+  try{
+    for(var s=0;s<data.scenarios.length;s++){
+      var scenario=data.scenarios[s];
+      out[scenario]=[];
+      for(var i=0;i<data.replicates;i++){
+        var world=new E.World({seed:data.seed+i*7919,scenario:scenario,sexual:data.sexual});
+        world.runTicks(E.TICKS_PER_DAY*data.days);
+        out[scenario].push(E.replicateStudy(world));
+        done++;
+        self.postMessage({type:'progress',done:done,total:total});
+      }
+    }
+    self.postMessage({type:'done',results:out});
+  }catch(error){
+    self.postMessage({type:'error',message:String((error&&error.message)||error)});
+  }
+};`;
+
+  let replicateJob=null;
+  let lastReplicateReport=null;
+
+  function setReplicateRunning(active){
+    $('#btnReplicate').disabled=active;
+    $('#btnReplicateCancel').hidden=!active;
+    $('#rReplicates').disabled=active;
+    $('#rRepDays').disabled=active;
+    $('#replicateProgress').hidden=!active;
+  }
+
+  function updateReplicateProgress(done,total){
+    $('#replicateProgress').firstElementChild.style.width=(total?done/total*100:0).toFixed(1)+'%';
+    $('#replicateStatus').textContent=`Đang chạy bản ${done}/${total}…`;
+  }
+
+  function formatInterval(summary,digits){
+    if(!summary.n) return '—';
+    if(!Number.isFinite(summary.ci)) return summary.mean.toFixed(digits);
+    return `${summary.mean.toFixed(digits)} ± ${summary.ci.toFixed(digits)}`;
+  }
+
+  function formatDelta(delta,digits){
+    // một nhánh không có chỉ số này (ví dụ Q_ST khi kịch bản không có rào cách ly)
+    if(!Number.isFinite(delta.difference)) return '—';
+    const sign=delta.difference>=0?'+':'';
+    if(!Number.isFinite(delta.ci)) return sign+delta.difference.toFixed(digits);
+    return `${sign}${delta.difference.toFixed(digits)} [${delta.low.toFixed(digits)}, ${delta.high.toFixed(digits)}]`;
+  }
+
+  function renderReplicates(scenarios,results,days,replicates){
+    const table=$('#replicateTable');
+    const primary=results[scenarios[0]]||[];
+    const secondary=scenarios.length>1?(results[scenarios[1]]||[]):null;
+    const aggregate=aggregateReplicates(primary);
+    table.classList.toggle('ab',!!secondary);
+    const rows=[secondary
+      ? '<span class="head">CHỈ SỐ</span><span class="head num">A</span><span class="head num">B</span><span class="head num">Δ (KTC 95%)</span>'
+      : '<span class="head">CHỈ SỐ</span><span class="head num">TRUNG BÌNH ± KTC 95%</span>'];
+    for(const [key,label,digits] of REPLICATE_FIELDS){
+      const a=aggregate.fields[key];
+      if(!secondary){
+        rows.push(`<span>${label}</span><span class="num">${formatInterval(a,digits)}</span>`);
+        continue;
+      }
+      const b=summarize(secondary.map(row=>row[key]));
+      const delta=welchDifference(primary.map(row=>row[key]),secondary.map(row=>row[key]));
+      rows.push(
+        `<span>${label}</span><span class="num">${formatInterval(a,digits)}</span>`+
+        `<span class="num">${formatInterval(b,digits)}</span>`+
+        `<span class="num ${delta.significant?'sig':'ns'}">${formatDelta(delta,digits)}</span>`
+      );
+    }
+    table.innerHTML=rows.join('');
+    const extinct=primary.filter(row=>row.extinct).length+
+      (secondary?secondary.filter(row=>row.extinct).length:0);
+    $('#replicateStatus').textContent=
+      `${replicates} bản × ${days} ngày${secondary?' cho mỗi nhánh':''} · ${sexualMode?'hữu tính':'vô tính'}`+
+      (extinct?` · ${extinct} bản tuyệt chủng`:'');
+    $('#replicateNote').textContent=secondary
+      ? 'Δ là chênh lệch B − A kèm khoảng tin cậy 95% (Welch). Khoảng không chứa 0 mới là bằng chứng khác biệt; màu xám nghĩa là dữ liệu chưa đủ để kết luận.'
+      : 'Trung bình ± khoảng tin cậy 95% trên các bản lặp. Bật chế độ đối chứng để so sánh hai kịch bản kèm kiểm định.';
+    lastReplicateReport={
+      scenarios,days,replicates,seed,reproduction:sexualMode?'sexual':'asexual',
+      results:scenarios.reduce((acc,scenario)=>{acc[scenario]=results[scenario]||[];return acc;},{})
+    };
+  }
+
+  function startReplicates(){
+    if(replicateJob) return;
+    const replicates=+$('#rReplicates').value;
+    const days=+$('#rRepDays').value;
+    const scenarios=compareMode&&worldB?[scenarioA,scenarioB]:[scenarioA];
+    const total=scenarios.length*replicates;
+    setReplicateRunning(true);
+    updateReplicateProgress(0,total);
+
+    const finish=(results)=>{
+      replicateJob=null;setReplicateRunning(false);
+      renderReplicates(scenarios,results,days,replicates);
+    };
+    const fail=(message)=>{
+      replicateJob=null;setReplicateRunning(false);
+      $('#replicateStatus').textContent='Không chạy được: '+message;
+    };
+
+    let worker=null;
+    try{
+      const core=document.getElementById('simCore').textContent;
+      const url=URL.createObjectURL(new Blob([core,WORKER_GLUE],{type:'text/javascript'}));
+      worker=new Worker(url);
+      URL.revokeObjectURL(url);
+    }catch(error){
+      worker=null;
+    }
+
+    if(worker){
+      replicateJob={cancel(){
+        worker.terminate();replicateJob=null;setReplicateRunning(false);
+        $('#replicateStatus').textContent='Đã dừng.';
+      }};
+      worker.onmessage=(event)=>{
+        const message=event.data;
+        if(message.type==='progress') updateReplicateProgress(message.done,message.total);
+        else if(message.type==='done'){ worker.terminate(); finish(message.results); }
+        else if(message.type==='error'){ worker.terminate(); fail(message.message); }
+      };
+      worker.onerror=(event)=>{ worker.terminate(); fail(event.message||'lỗi worker'); };
+      worker.postMessage({scenarios,replicates,days,seed,sexual:sexualMode});
+      return;
+    }
+
+    // Dự phòng khi không tạo được worker (ví dụ mở trực tiếp bằng file://):
+    // chạy trên luồng chính nhưng cắt từng bản để giao diện còn kịp vẽ lại.
+    const results={};
+    let index=0, cancelled=false;
+    replicateJob={cancel(){
+      cancelled=true;replicateJob=null;setReplicateRunning(false);
+      $('#replicateStatus').textContent='Đã dừng.';
+    }};
+    const runOne=()=>{
+      if(cancelled) return;
+      const scenario=scenarios[Math.floor(index/replicates)];
+      const replicate=index%replicates;
+      if(!results[scenario]) results[scenario]=[];
+      const study=new World({seed:seed+replicate*7919,scenario,sexual:sexualMode});
+      study.runTicks(TICKS_PER_DAY*days);
+      results[scenario].push(replicateStudy(study));
+      index++;
+      updateReplicateProgress(index,total);
+      if(index<total) setTimeout(runOne,0);
+      else finish(results);
+    };
+    setTimeout(runOne,0);
+  }
+
   function loop(now){
-    const dt = Math.min(100, now - last); last = now;
+    const elapsed=Math.min(100,now-last);last=now;
+    let stepped=0;
     if(running){
-      acc += dt * speedMul;
-      const stepMs = 1000/60;
-      let n = 0;
-      while(acc >= stepMs && n < 24){ world.step(); acc -= stepMs; n++; }
-      if(acc > 400) acc = 0;
+      acc+=elapsed*speedMul;
+      const stepMs=1000/60;
+      while(acc>=stepMs&&stepped<28){
+        world.step();
+        if(compareMode&&worldB)worldB.step();
+        acc-=stepMs;stepped++;
+      }
+      if(acc>500)acc=0;
+    }
+    // Bộ chặn 28 bước/khung và việc vứt bỏ backlog khiến 4x có thể lặng lẽ
+    // thành 2x. Đo nhịp thật và nói ra, thay vì để nhãn tốc độ nói dối.
+    rateSteps+=stepped;
+    if(now-rateSince>500){
+      const achieved=rateSteps/((now-rateSince)/1000)/60;
+      const label=$('#speedActual');
+      const behind=running&&achieved<speedMul*0.92;
+      label.textContent=behind?'thực tế '+achieved.toFixed(1)+'x':'';
+      label.hidden=!behind;
+      rateSteps=0;rateSince=now;
     }
     draw();
-    if(!loop.t || now - loop.t > 120){ hud(); loop.t = now; }
+    if(!loop.lastHud||now-loop.lastHud>140){hud();loop.lastHud=now;}
     requestAnimationFrame(loop);
   }
 
-  // ---------- controls ----------
-  $('#btnRun').addEventListener('click', ()=>{
-    running = !running; acc = 0;
-    $('#btnRun').textContent = running ? 'Tạm dừng' : 'Chạy';
-    $('#btnRun').classList.toggle('primary', !running);
+  $('#scenarioGrid').addEventListener('click',event=>{
+    const button=event.target.closest('[data-scenario]');
+    if(button)applyScenario(button.dataset.scenario);
   });
-  $('#btnStep').addEventListener('click', ()=>{
-    running = false; $('#btnRun').textContent='Chạy'; $('#btnRun').classList.add('primary');
-    world.step(); draw(); hud();
+  $('#studyMode').addEventListener('click',event=>{
+    const button=event.target.closest('[data-mode]');
+    if(!button)return;
+    compareMode=button.dataset.mode==='compare';
+    makeStudy();
   });
-  $('#btnReset').addEventListener('click', ()=>{ world.reset(); selectedId=null; resizeArena(); draw(); hud(); });
-  $('#btnNew').addEventListener('click', ()=>{
-    world.seed = Math.floor(Math.random()*1e9);
-    world.reset(); selectedId=null; resizeArena(); draw(); hud();
+  $('#scenarioB').addEventListener('change',event=>{
+    scenarioB=event.target.value;
+    if(compareMode)makeStudy();
   });
-  $('#speedSeg').addEventListener('click', (e)=>{
-    const b = e.target.closest('button'); if(!b) return;
-    speedMul = parseFloat(b.dataset.sp);
-    [...e.currentTarget.children].forEach(x=>x.classList.toggle('on', x===b));
+  $('#btnRun').addEventListener('click',()=>{
+    running=!running;acc=0;
+    $('#btnRun').textContent=running?'Tạm dừng':'Chạy';
+    $('#btnRun').classList.toggle('primary',!running);
   });
-  $('#chkPred').addEventListener('change', e=>{ world.params.predation = e.target.checked; });
-  $('#rFood').addEventListener('input', e=>{
-    world.params.foodPerDay = +e.target.value; $('#vFood').textContent = e.target.value;
+  $('#btnStep').addEventListener('click',()=>{
+    running=false;$('#btnRun').textContent='Chạy';
+    world.step();if(compareMode&&worldB)worldB.step();
+    draw();hud();
   });
-  $('#rMut').addEventListener('input', e=>{
-    world.params.mutation = +e.target.value/100; $('#vMut').textContent = e.target.value + '%';
+  $('#btnReset').addEventListener('click',()=>makeStudy());
+  $('#btnNew').addEventListener('click',()=>{
+    seed=Math.floor(Math.random()*1e9);
+    makeStudy();
+    notify('Seed mới: '+seed);
   });
-  $('#rCost').addEventListener('input', e=>{
-    world.params.costMul = +e.target.value/100; $('#vCost').textContent = (+e.target.value/100).toFixed(2)+'x';
+  $('#speedSeg').addEventListener('click',event=>{
+    const button=event.target.closest('[data-sp]');
+    if(!button)return;
+    speedMul=+button.dataset.sp;
+    $$('#speedSeg button').forEach(item=>item.classList.toggle('on',item===button));
   });
-  arena.addEventListener('click', (e)=>{
-    const r = arena.getBoundingClientRect();
-    const x = e.clientX - r.left, y = e.clientY - r.top;
-    let best = null, bd = Infinity;
-    for(const c of world.creatures){
-      const d = (c.x-x)*(c.x-x) + (c.y-y)*(c.y-y);
-      const rad = c.radius + 7;
-      if(d < rad*rad && d < bd){ bd = d; best = c; }
+  $('#chkPred').addEventListener('change',event=>{world.params.predation=event.target.checked;});
+  $('#chkSexual').addEventListener('change',event=>{
+    sexualMode=event.target.checked;
+    makeStudy();
+    notify(sexualMode?'Sinh sản hữu tính: con tái tổ hợp gene của hai cha mẹ':'Sinh sản vô tính: con là bản sao có đột biến');
+  });
+  $('#rFood').addEventListener('input',event=>{world.params.foodPerDay=+event.target.value;$('#vFood').textContent=event.target.value;});
+  $('#rMut').addEventListener('input',event=>{world.params.mutation=+event.target.value/100;$('#vMut').textContent=event.target.value+'%';});
+  $('#rCost').addEventListener('input',event=>{world.params.costMul=+event.target.value/100;$('#vCost').textContent=world.params.costMul.toFixed(2)+'x';});
+  $('#rReplicates').addEventListener('input',event=>{$('#vReplicates').textContent=event.target.value;});
+  $('#rRepDays').addEventListener('input',event=>{$('#vRepDays').textContent=event.target.value;});
+  $('#btnReplicate').addEventListener('click',startReplicates);
+  $('#btnReplicateCancel').addEventListener('click',()=>{ if(replicateJob) replicateJob.cancel(); });
+  $('#btnSave').addEventListener('click',saveExperiment);
+  $('#btnLoad').addEventListener('click',loadExperiment);
+  $('#btnExportJson').addEventListener('click',()=>downloadExperiment('json'));
+  $('#btnExportCsv').addEventListener('click',()=>downloadExperiment('csv'));
+  $('#timeline').addEventListener('input',updateTimeline);
+  arena.addEventListener('click',event=>{
+    const rect=arena.getBoundingClientRect();
+    const views=paneViews(rect.width,rect.height);
+    // đổi toạ độ màn hình về toạ độ sân mô phỏng
+    const x=(event.clientX-rect.left-views.a.ox)/views.a.scale;
+    const y=(event.clientY-rect.top-views.a.oy)/views.a.scale;
+    if(x<0||y<0||x>SIM_WIDTH||y>SIM_HEIGHT){selectedId=null;selectedPanel();draw();return;}
+    let best=null,bestDistance=Infinity;
+    for(const creature of world.creatures){
+      const distance=(creature.x-x)*(creature.x-x)+(creature.y-y)*(creature.y-y);
+      const reach=creature.radius+7;
+      if(distance<reach*reach&&distance<bestDistance){best=creature;bestDistance=distance;}
     }
-    selectedId = best ? best.id : null;
-    selPanel(); draw();
+    selectedId=best?best.id:null;selectedPanel();draw();
   });
-  window.addEventListener('keydown', (e)=>{
-    if(e.code === 'Space' && e.target === document.body){ e.preventDefault(); $('#btnRun').click(); }
+  window.addEventListener('keydown',event=>{
+    if(event.code==='Space'&&event.target===document.body){
+      event.preventDefault();$('#btnRun').click();
+    }
   });
+  const observer=new ResizeObserver(()=>{resizeArena();draw();});
+  observer.observe(arena.parentElement);
 
-  resizeArena(); hud(); draw();
+  syncControls();
+  resizeArena();
+  draw();
+  hud();
   requestAnimationFrame(loop);
 })();
 </script>

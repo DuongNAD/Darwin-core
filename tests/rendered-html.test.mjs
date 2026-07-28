@@ -54,6 +54,13 @@ test("ships a self-contained, executable simulation artifact", async () => {
   assert.match(source, /ResizeObserver/);
   assert.match(source, /devicePixelRatio/);
   assert.match(source, /requestAnimationFrame/);
+  assert.match(source, /id="scenarioGrid"/);
+  assert.match(source, /id="researchChart"/);
+  assert.match(source, /id="eventLog"/);
+  assert.match(source, /id="conclusion"/);
+  assert.match(source, /class ComparisonStudy/);
+  assert.match(source, /function exportExperiment/);
+  assert.equal((source.match(/data-scenario="/g) ?? []).length, 8);
   assert.doesNotMatch(source, /\bTODO\b|\bPLACEHOLDER\b/i);
 
   const script = source.match(/<script>([\s\S]*?)<\/script>/i);
