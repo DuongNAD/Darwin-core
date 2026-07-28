@@ -777,23 +777,29 @@ class World {
   }
   // --- spatial hash ---
   buildGrid(items, cell){
-    const g = new Map(), cols = Math.ceil(this.W/cell);
+    const g = new Map(), cols = Math.ceil(this.W/cell), rows = Math.ceil(this.H/cell);
     for(let i=0;i<items.length;i++){
       const it = items[i];
       const k = (Math.floor(it.y/cell)*cols) + Math.floor(it.x/cell);
       let b = g.get(k); if(!b){ b=[]; g.set(k,b); }
       b.push(i);
     }
-    return { map:g, cell, cols };
+    return { map:g, cell, cols, rows };
   }
   query(grid, x, y, r, out){
     out.length = 0;
-    const c = grid.cell, cols = grid.cols;
-    const x0=Math.floor((x-r)/c), x1=Math.floor((x+r)/c);
-    const y0=Math.floor((y-r)/c), y1=Math.floor((y+r)/c);
+    const c = grid.cell, cols = grid.cols, rows = grid.rows;
+    // Cắt vùng quét về trong lưới. Nếu không cắt, cột -1 cho chỉ số
+    // gy*cols-1 = (gy-1)*cols + (cols-1) — một ô HỢP LỆ ở cuối hàng trên,
+    // nên cá thể sát mép trái sẽ "nhìn thấy" vật ở mép phải.
+    let x0=Math.floor((x-r)/c), x1=Math.floor((x+r)/c);
+    let y0=Math.floor((y-r)/c), y1=Math.floor((y+r)/c);
+    if(x0<0) x0=0; if(x1>=cols) x1=cols-1;
+    if(y0<0) y0=0; if(y1>=rows) y1=rows-1;
     for(let gy=y0; gy<=y1; gy++){
+      const row = gy*cols;
       for(let gx=x0; gx<=x1; gx++){
-        const b = grid.map.get(gy*cols+gx);
+        const b = grid.map.get(row+gx);
         if(b) for(let i=0;i<b.length;i++) out.push(b[i]);
       }
     }

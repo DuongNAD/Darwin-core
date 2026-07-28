@@ -457,6 +457,33 @@ test("reproduction mode is a study-level variable applied to both arms", () => {
   assert.match(html, /sexual:data\.sexual/);
 });
 
+test("perception does not wrap around the arena edges", async () => {
+  const engine = await loadEngine();
+  const world = new engine.World({ seed: 1, scenario: "baseline" });
+
+  // One item at the far right of the top row. A cell index of gy*cols + gx
+  // with gx = -1 lands on (gy-1)*cols + (cols-1) — this very cell — so an
+  // unclamped query from the left edge one row down used to find it.
+  world.food = [{ x: world.W - 20, y: 10 }];
+  const grid = world.buildGrid(world.food, 48);
+  assert.equal(grid.cols, Math.ceil(world.W / 48));
+  assert.equal(grid.rows, Math.ceil(world.H / 48));
+
+  const out = [];
+  world.query(grid, 10, 60, 30, out);
+  assert.deepEqual([...out], [], "the left edge must not see the right edge of the row above");
+
+  // The same query still finds something genuinely close by.
+  world.food = [{ x: 14, y: 55 }];
+  world.query(world.buildGrid(world.food, 48), 10, 60, 30, out);
+  assert.equal(out.length, 1, "a nearby item must still be found");
+
+  // And an item at the far side of the arena is never reachable.
+  world.food = [{ x: world.W - 20, y: 60 }];
+  world.query(world.buildGrid(world.food, 48), 10, 60, 30, out);
+  assert.deepEqual([...out], [], "the far side of the arena is out of range");
+});
+
 test("the artifact carries no disabled dead code", () => {
   // An entire earlier UI used to sit in the file behind `if(false){ … }`,
   // shipped to every visitor and invisible to every test.

@@ -1,10 +1,15 @@
 // Đo hiệu năng engine hiện tại. Chạy: node scripts/benchmark.mjs
 //
-// Bài học từ lần đo trước: KHÔNG so sánh nhiều biến thể trong cùng một tiến
-// trình. Biến thể chạy đầu tiên luôn bị phạt vì JIT còn nguội, và thiên lệch đó
-// đủ lớn để tạo ra một con số "nhanh gấp đôi" hoàn toàn giả. Muốn so hai bản
-// engine thì chạy script này hai lần ở hai tiến trình riêng, mỗi bản vài lượt,
-// rồi so phân bố — chênh lệch dưới ~15% trên máy thường là nhiễu.
+// Hai bài học đắt giá khi đo engine này:
+//
+// 1. KHÔNG so sánh nhiều biến thể trong cùng một tiến trình. Biến thể chạy đầu
+//    tiên luôn bị phạt vì JIT còn nguội, và thiên lệch đó từng tạo ra một con
+//    số "nhanh gấp đôi" hoàn toàn giả.
+// 2. Số tuyệt đối ở đây dao động mạnh theo tải máy — cùng một mã nguồn đã cho
+//    tổng chênh nhau hơn hai lần giữa hai lần chạy.
+//
+// Vì vậy: đừng dùng số tuyệt đối để kết luận. Muốn so hai bản engine, chạy
+// từng bản trong tiến trình RIÊNG, xen kẽ nhiều lượt, rồi so từng cặp.
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 
@@ -36,10 +41,15 @@ console.log("-".repeat(59));
 
 let total = 0;
 for (const [scenario, sexual] of CASES) {
-  const world = new engine.World({ seed: 909, scenario, sexual });
-  const started = process.hrtime.bigint();
-  world.runTicks(engine.TICKS_PER_DAY * DAYS);
-  const ms = Number(process.hrtime.bigint() - started) / 1e6;
+  // lấy lượt nhanh nhất trong hai lượt để bớt ảnh hưởng của một cú GC lạc
+  let ms = Infinity;
+  let world = null;
+  for (let run = 0; run < 2; run++) {
+    world = new engine.World({ seed: 909, scenario, sexual });
+    const started = process.hrtime.bigint();
+    world.runTicks(engine.TICKS_PER_DAY * DAYS);
+    ms = Math.min(ms, Number(process.hrtime.bigint() - started) / 1e6);
+  }
   total += ms;
   console.log(
     scenario.padEnd(12) +
