@@ -97,9 +97,23 @@ gene theo từng ngày.
 
 ## Hạn chế đã biết
 
-- **Giả thuyết của `scarcity` chưa được ủng hộ** ở 5 bản lặp × 20 ngày: tốc độ,
-  cảm nhận và trao đổi chất đều có khoảng tin cậy chứa 0. Hiệu ứng có thể xuất
-  hiện ở thời lượng dài hơn — đó chính là lý do khoảng tin cậy tồn tại.
+- **Ba kịch bản tuyên bố điều dữ liệu không ủng hộ.** Chạy
+  `node scripts/audit-hypotheses.mjs` để tự kiểm; kết quả ở 12 bản lặp × 40 ngày
+  so với đối chứng:
+
+  | Kịch bản | Tuyên bố | Dữ liệu nói |
+  |---|---|---|
+  | `scarcity` | tốc độ, cảm nhận, trao đổi chất tiết kiệm | tốc độ +0.97 ✓ · cảm nhận +33 ✓ · **trao đổi chất không khác** |
+  | `abundance` | duy trì nhiều kiểu gene cùng tồn tại | **đa dạng không khác đối chứng** |
+  | `predator` | ngụy trang, tốc độ, kích thước đều đổi | kích thước +1.64 ✓ · **ngụy trang và tốc độ không khác** |
+  | `climate` | chọn lọc trao đổi chất | trao đổi chất +0.08 ✓ |
+  | `epidemic` | làm tăng miễn dịch | **miễn dịch không khác đối chứng** |
+  | `islands` | hai chiến lược kiếm ăn khác nhau | Q_ST 0.20 ± 0.04 ✓ |
+  | `extinction` | quét sạch quần thể + thắt cổ chai | quần thể −35 ✓ · **không thấy dấu thắt cổ chai** |
+
+  Giả thuyết ở đây là thứ để **kiểm chứng**, nên chúng được giữ nguyên văn thay
+  vì sửa cho khớp kết quả. Ba dòng in đậm là việc còn phải làm: hoặc chỉnh cơ
+  chế kịch bản cho đúng điều nó hứa, hoặc bỏ lời hứa đó đi.
 - **Vòng chạy trực tiếp ở luồng chính** (worker chỉ gánh phần lặp lại). Đo trong
   trình duyệt cho thấy điều này ổn: ngay ở trần quần thể 460 kèm sinh sản hữu
   tính, một nhịp tốn 0.614 ms, nên 4x chỉ cần ~15% một lõi và 4 nhịp mỗi khung

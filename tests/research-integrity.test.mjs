@@ -335,6 +335,46 @@ test("replicates use independent seeds and aggregate into intervals", async () =
   assert.ok(Number.isFinite(islands.fields.differentiation.mean));
 });
 
+test("a dead population contributes no trait measurements", async () => {
+  const engine = await loadEngine();
+
+  // stats() returns 0 for every gene when nobody is left. Folding those zeros
+  // into a trait mean mixes "the population died" with "this gene is low",
+  // dragging the mean down and inflating the variance.
+  const world = new engine.World({ seed: 5, scenario: "baseline" });
+  world.runTicks(engine.TICKS_PER_DAY * 3);
+  world.creatures = [];
+
+  const summary = engine.replicateStudy(world);
+  assert.equal(summary.extinct, true);
+  assert.equal(summary.population, 0, "population zero is a real measurement");
+  for (const gene of [
+    "speed", "size", "perception",
+    "metabolism", "immunity", "camouflage", "fecundity",
+    "geneticDiversity", "effectiveLineages",
+  ]) {
+    assert.ok(
+      Number.isNaN(summary[gene]),
+      `${gene} must not report a value for a dead population (got ${summary[gene]})`,
+    );
+  }
+
+  // Aggregation keeps counting extinctions while ignoring their fake zeros.
+  const survivor = engine.replicateStudy(
+    (() => {
+      const w = new engine.World({ seed: 7, scenario: "baseline" });
+      w.runTicks(engine.TICKS_PER_DAY * 3);
+      return w;
+    })(),
+  );
+  const aggregate = engine.aggregateReplicates([summary, survivor, survivor]);
+  assert.equal(aggregate.replicates, 3);
+  assert.equal(aggregate.extinctions, 1);
+  assert.equal(aggregate.fields.population.n, 3, "population counts every replicate");
+  assert.equal(aggregate.fields.speed.n, 2, "speed counts only the live ones");
+  assert.ok(Math.abs(aggregate.fields.speed.mean - survivor.speed) < 1e-9);
+});
+
 test("selection differentials are measured over a closed day, not an empty window", async () => {
   const engine = await loadEngine();
   const world = new engine.World({ seed: 31, scenario: "scarcity" });

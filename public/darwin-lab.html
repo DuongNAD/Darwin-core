@@ -1321,17 +1321,24 @@ function welchDifference(aValues,bValues){
 function replicateStudy(engineWorld){
   const metrics=engineWorld.researchMetrics();
   const stats=engineWorld.stats();
+  const extinct=metrics.population===0;
+  // Quần thể chết thì stats() trả 0 cho mọi gene. Đó KHÔNG phải phép đo tính
+  // trạng — gộp số 0 đó vào trung bình sẽ trộn "quần thể đã chết" với "gene có
+  // giá trị thấp", kéo trung bình xuống và thổi phồng phương sai. Đánh dấu NaN
+  // để summarize() bỏ qua; số bản tuyệt chủng vẫn được đếm riêng.
+  const trait=(value)=> extinct ? NaN : value;
   return {
     population:metrics.population,
-    geneticDiversity:metrics.geneticDiversity,
-    effectiveLineages:metrics.effectiveLineages,
+    geneticDiversity:trait(metrics.geneticDiversity),
+    effectiveLineages:trait(metrics.effectiveLineages),
+    // số con trọn đời tính trên những cá thể đã sống hết đời, vẫn có nghĩa
     meanOffspring:metrics.meanOffspring,
     // NaN khi kịch bản không có tiểu quần thể; summarize() sẽ bỏ qua và báo "—"
     differentiation:metrics.differentiation ? metrics.differentiation.mean : NaN,
-    speed:stats.speed, size:stats.size, perception:stats.perception,
-    metabolism:stats.metabolism, immunity:stats.immunity,
-    camouflage:stats.camouflage, fecundity:stats.fecundity,
-    extinct:metrics.population===0
+    speed:trait(stats.speed), size:trait(stats.size), perception:trait(stats.perception),
+    metabolism:trait(stats.metabolism), immunity:trait(stats.immunity),
+    camouflage:trait(stats.camouflage), fecundity:trait(stats.fecundity),
+    extinct
   };
 }
 // Chạy nhiều bản lặp độc lập của cùng một kịch bản. Mỗi bản dùng một hạt giống
