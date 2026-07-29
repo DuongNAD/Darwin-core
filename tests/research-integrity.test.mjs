@@ -222,16 +222,18 @@ test("the predation tooltip matches the rule in the engine", async () => {
   const source = html.match(
     /\/\/ ===== SIM CORE START =====([\s\S]*?)\/\/ ===== SIM CORE END =====/,
   )[1];
-  const rule = source.match(/g\.size < o\.genes\.size\*([\d.]+)/);
-  assert.ok(rule, "predation size rule is present");
 
-  const advertised = html.match(/lớn hơn đối thủ ít nhất (\d+)%/);
-  assert.ok(advertised, "predation tooltip states a threshold");
-  assert.equal(
-    Number(advertised[1]),
-    Math.round((Number(rule[1]) - 1) * 100),
-    "tooltip and engine must state the same size advantage",
-  );
+  // Predation is no longer size-gated cannibalism: a separate species hunts
+  // regardless of size, so the old 1.5x threshold must be gone for good.
+  assert.doesNotMatch(source, /g\.size < o\.genes\.size\*/);
+  assert.doesNotMatch(html, /lớn hơn đối thủ ít nhất/);
+
+  // Prey escape by not being seen or by outrunning the hunter — both are in
+  // the engine, and the tooltip has to say so.
+  assert.match(source, /o\.species===CARNIVORE\) continue/);
+  assert.match(source, /this\.rand\(\)>this\.detectionProbability\(o\)/);
+  assert.match(source, /clamp\(g\.speed\/\(o\.genes\.speed\*6\)/);
+  assert.match(html, /ngụy trang.*chạy nhanh/s);
   assert.ok(engine.SCENARIOS.predator.params.predation);
 });
 

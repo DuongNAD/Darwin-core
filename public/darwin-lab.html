@@ -296,7 +296,7 @@
       </div>
       <span class="speed-actual" id="speedActual" hidden></span>
       <div class="spacer"></div>
-      <label class="switch" data-tip="Cá thể lớn hơn đối thủ ít nhất 50% có thể ăn thịt đối thủ. Bật lên, kích thước lớn chuyển từ gánh nặng thành vũ khí.">
+      <label class="switch" data-tip="Bật lên, một LOÀI ăn thịt riêng xuất hiện từ ngày 7. Nó săn con mồi bất kể kích thước, nên to xác không còn là lối thoát — con mồi chỉ thoát được bằng ngụy trang (không bị phát hiện) hoặc chạy nhanh (thoát khi bị đuổi).">
         <input type="checkbox" id="chkPred"><span>Săn mồi</span>
       </label>
       <label class="switch" data-tip="Bật lên, con thừa hưởng mỗi gene từ một trong hai cha mẹ (tái tổ hợp) thay vì là bản sao có đột biến của một cá thể. Cha mẹ phải tìm được nhau trong bán kính cảm nhận. Đổi công tắc này sẽ dựng lại thí nghiệm.">
@@ -545,7 +545,7 @@ const SCENARIOS = {
   },
   predator: {
     name: 'Áp lực săn mồi',
-    hypothesis: 'Săn mồi ưu tiên cơ thể lớn: vượt ngưỡng kích thước là thoát hẳn, nên ngụy trang không kịp có giá trị.',
+    hypothesis: 'Một loài ăn thịt riêng săn bất kể kích thước, nên con mồi phải đầu tư vào ngụy trang và tốc độ thay vì to xác.',
     params: { foodPerDay:145, mutation:0.14, costMul:1, predation:true }
   },
   climate: {
@@ -570,8 +570,22 @@ const SCENARIOS = {
   }
 };
 
+// Hai bậc dinh dưỡng. Loài ăn thịt là một LOÀI RIÊNG, không phải cá thể to xác
+// ăn đồng loại: nó săn con mồi bất kể kích thước, nên to xác thôi không còn là
+// lối thoát tuyệt đối và ngụy trang mới có chỗ đứng.
+const HERBIVORE = 'herbivore';
+const CARNIVORE = 'carnivore';
+const CARNIVORE_YIELD = 26;      // năng lượng thu được trên mỗi đơn vị kích thước con mồi
+const CARNIVORE_BROOD = 3;       // kẻ săn phải bắt được nhiều con mồi hơn mới sinh sản được
+const CARNIVORE_START = 8;       // số cá thể ăn thịt của lứa đầu
+// Kẻ săn mồi đến SAU khi con mồi đã gây dựng được quần thể. Thả cùng lúc với 45
+// cá thể sáng lập thì chúng quét sạch nền rồi tự chết đói: đo được 4/5 hạt giống
+// mất hẳn loài ăn cỏ và thảm thực vật phủ kín tới trần.
+const CARNIVORE_ARRIVAL = 7;     // ngày loài ăn thịt xuất hiện
+
 class Creature {
-  constructor(id, x, y, genes, energy, birthDay, gen){
+  constructor(id, x, y, genes, energy, birthDay, gen, species){
+    this.species = species || HERBIVORE;
     this.id=id; this.x=x; this.y=y;
     this.genes=genes; this.energy=energy;
     this.age=0; this.eaten=0; this.gen=gen; this.birthDay=birthDay;
@@ -647,9 +661,10 @@ class World {
           camouflage:this.rr(0.18,0.72),
           fecundity:this.rr(0.86,1.18)
         },
-        120, 1, 0
+        120, 1, 0, HERBIVORE
       ));
     }
+    this.carnivoresArrived = false;
     // Ngày đầu bắt đầu bằng thảm thực vật đã trưởng thành, không phải hạt.
     this.spawnFood(180, 1);
     this.record();
@@ -718,6 +733,26 @@ class World {
     } else {
       this.environment.diseaseLoad*=.72;
     }
+    if(this.params.predation && this.day>=CARNIVORE_ARRIVAL && !this.carnivoresArrived){
+      this.carnivoresArrived=true;
+      for(let i=0;i<CARNIVORE_START;i++){
+        this.creatures.push(new Creature(
+          this.nextId++,
+          this.rr(40,this.W-40), this.rr(40,this.H-40),
+          {
+            speed:this.rr(1.6,3.0),
+            size:this.rr(1.2,2.1),
+            perception:this.rr(45,90),
+            metabolism:this.rr(0.85,1.2),
+            immunity:this.rr(0.1,0.4),
+            camouflage:this.rr(0.2,0.6),
+            fecundity:this.rr(0.8,1.1)
+          },
+          180, this.day, 0, CARNIVORE
+        ));
+      }
+      this.logEvent('predator','Kẻ săn mồi xuất hiện',`${CARNIVORE_START} cá thể ăn thịt tới vùng này`);
+    }
     if(this.params.extinction && this.day===12 && !this.extinctionTriggered){
       this.extinctionTriggered=true;
       let lost=0;
@@ -747,6 +782,7 @@ class World {
       lastSelection:{...this.lastSelection},
       interventions:this.interventions.map(entry=>({...entry})),
       extinctionTriggered:this.extinctionTriggered,
+      carnivoresArrived:this.carnivoresArrived,
       params:{...this.params},
       environment:{...this.environment},
       deathCauses:{...this.deathCauses},
@@ -770,6 +806,7 @@ class World {
     w.lastSelection={...w.zeroSelection(),...(data.lastSelection||{})};
     w.interventions=(data.interventions||[]).map(entry=>({...entry}));
     w.extinctionTriggered=!!data.extinctionTriggered;
+    w.carnivoresArrived=!!data.carnivoresArrived;
     w.params={...data.params};
     w.environment={...data.environment};
     w.deathCauses={...data.deathCauses};
@@ -799,8 +836,11 @@ class World {
   }
   reproductionRequirement(creature){
     const fecundity=creature?.genes?.fecundity ?? 1;
+    // Kẻ săn mồi phải bắt được nhiều con mồi hơn mới đủ sinh sản: nếu không,
+    // một lứa nhỏ bùng lên trong một ngày và quét sạch bậc dưới.
+    const brood=creature?.species===CARNIVORE ? CARNIVORE_BROOD : 1;
     return {
-      food:clamp(2.55-fecundity*1.15,1,2),
+      food:clamp(2.55-fecundity*1.15,1,2)*brood,
       energy:clamp(88-fecundity*18,60,78),
       cost:clamp(66-fecundity*8,53,61),
       // Đánh đổi thật của gene sinh sản: đẻ sớm hơn thì con non yếu hơn.
@@ -946,26 +986,26 @@ class World {
       const per = g.perception;
       let tx=null, ty=null, best=Infinity, preyIdx=-1;
 
-      // nearest food inside perception
-      this.query(foodGrid, c.x, c.y, per, buf);
-      for(let k=0;k<buf.length;k++){
-        const fi = buf[k]; if(eatenFood.has(fi)) continue;
-        const f = this.food[fi];
-        if(f.growth < 1) continue;   // mầm chưa ăn được nên cũng không đáng đi tới
-        const d = (f.x-c.x)*(f.x-c.x) + (f.y-c.y)*(f.y-c.y);
-        if(d < best && d < per*per){ best=d; tx=f.x; ty=f.y; }
-      }
-      // nearest smaller creature (predation)
-      const hungry = c.energy < c.maxEnergy*0.62;
-      if(P.predation && hungry){
+      const carnivore = c.species === CARNIVORE;
+      // Loài ăn cỏ tìm cây trưởng thành; loài ăn thịt không ăn thực vật.
+      if(!carnivore){
+        this.query(foodGrid, c.x, c.y, per, buf);
+        for(let k=0;k<buf.length;k++){
+          const fi = buf[k]; if(eatenFood.has(fi)) continue;
+          const f = this.food[fi];
+          if(f.growth < 1) continue;   // mầm chưa ăn được nên cũng không đáng đi tới
+          const d = (f.x-c.x)*(f.x-c.x) + (f.y-c.y)*(f.y-c.y);
+          if(d < best && d < per*per){ best=d; tx=f.x; ty=f.y; }
+        }
+      } else if(cGrid){
+        // Săn con mồi bất kể kích thước — chỉ ngụy trang của con mồi che được nó.
         this.query(cGrid, c.x, c.y, per, buf);
         for(let k=0;k<buf.length;k++){
           const oi = buf[k]; const o = cs[oi];
-          if(oi===i || !o.alive) continue;
-          if(g.size < o.genes.size*1.5) continue;
+          if(oi===i || !o.alive || o.species===CARNIVORE) continue;
           if(this.rand()>this.detectionProbability(o)) continue;
           const d = (o.x-c.x)*(o.x-c.x) + (o.y-c.y)*(o.y-c.y);
-          if(d < best*0.85 && d < per*per){ best=d; tx=o.x; ty=o.y; preyIdx=oi; }
+          if(d < best && d < per*per){ best=d; tx=o.x; ty=o.y; preyIdx=oi; }
         }
       }
 
@@ -996,28 +1036,33 @@ class World {
         }
       }
 
-      // eat food on contact
+      // eat plants on contact — chỉ loài ăn cỏ
       const reach = c.radius + 3;
-      this.query(foodGrid, c.x, c.y, reach, buf);
-      for(let k=0;k<buf.length;k++){
-        const fi = buf[k]; if(eatenFood.has(fi)) continue;
-        const f = this.food[fi];
-        if(f.growth < 1) continue;
-        if((f.x-c.x)*(f.x-c.x) + (f.y-c.y)*(f.y-c.y) < reach*reach){
-          eatenFood.add(fi);
-          c.energy = Math.min(c.maxEnergy, c.energy + FOOD_ENERGY);
-          c.eaten++; c.flash = 10;
-          break;
+      if(!carnivore){
+        this.query(foodGrid, c.x, c.y, reach, buf);
+        for(let k=0;k<buf.length;k++){
+          const fi = buf[k]; if(eatenFood.has(fi)) continue;
+          const f = this.food[fi];
+          if(f.growth < 1) continue;
+          if((f.x-c.x)*(f.x-c.x) + (f.y-c.y)*(f.y-c.y) < reach*reach){
+            eatenFood.add(fi);
+            c.energy = Math.min(c.maxEnergy, c.energy + FOOD_ENERGY);
+            c.eaten++; c.flash = 10;
+            break;
+          }
         }
-      }
-      // eat prey on contact
-      if(P.predation && preyIdx>=0){
+      } else if(preyIdx>=0){
         const o = cs[preyIdx];
         if(o.alive){
           const rr = c.radius + o.radius;
-          if((o.x-c.x)*(o.x-c.x) + (o.y-c.y)*(o.y-c.y) < rr*rr){
+          if((o.x-c.x)*(o.x-c.x) + (o.y-c.y)*(o.y-c.y) < rr*rr &&
+             // Con mồi nhanh chân chạy thoát được. Cùng với ngụy trang, đây là
+             // lối thoát thứ hai — và cả hai đều KHÔNG phải là to xác.
+             this.rand() < clamp(g.speed/(o.genes.speed*6), 0.05, 0.55)){
             o.alive=false; o.dead='predation';
-            c.energy = Math.min(c.maxEnergy, c.energy + 24 + o.genes.size*20);
+            // con mồi lớn nuôi được lâu hơn, nên kích thước con mồi vừa là áo
+            // giáp vừa là phần thưởng cho kẻ săn — không còn là lối thoát
+            c.energy = Math.min(c.maxEnergy, c.energy + CARNIVORE_YIELD*o.genes.size);
             c.eaten++; c.flash = 14;
           }
         }
@@ -1102,7 +1147,7 @@ class World {
         clamp(c.x + this.rr(-12,12), 6, this.W-6),
         clamp(c.y + this.rr(-12,12), 6, this.H-6),
         partner ? this.mutate(this.recombine(c.genes, partner.genes)) : this.mutate(c.genes),
-        requirement.childEnergy, this.day, c.gen+1
+        requirement.childEnergy, this.day, c.gen+1, c.species
       );
       // Dòng dõi truyền theo cha mẹ mang thai, nên "dòng dõi" ở chế độ hữu tính
       // là dòng mẹ — tương tự cách người ta lần theo mtDNA.
@@ -1154,6 +1199,7 @@ class World {
       if(oi===index) continue;
       const o = cs[oi];
       if(!o.alive) continue;
+      if(o.species !== c.species) continue;   // hai loài không lai với nhau
       if(o.energy < o.maxEnergy*0.4) continue;
       const d = (o.x-c.x)*(o.x-c.x) + (o.y-c.y)*(o.y-c.y);
       if(d < bestDistance && d < radius*radius){ bestDistance=d; best=oi; }
@@ -1206,12 +1252,25 @@ class World {
     if(this.history.length > 600) this.history.shift();
     for(const c of this.creatures) c.offspringToday=0;
   }
-  stats(){
-    const n = this.creatures.length;
+  // Loài ăn cỏ là quần thể được nghiên cứu. Gộp chung gene của hai loài vào một
+  // trung bình sẽ làm hỏng mọi chỉ số, vì chúng chịu chọn lọc khác hẳn nhau.
+  herbivores(){
+    const out=[];
+    for(const c of this.creatures) if(c.species!==CARNIVORE) out.push(c);
+    return out;
+  }
+  carnivores(){
+    const out=[];
+    for(const c of this.creatures) if(c.species===CARNIVORE) out.push(c);
+    return out;
+  }
+  stats(group){
+    const list = group || this.herbivores();
+    const n = list.length;
     if(!n) return { pop:0, speed:0, size:0, perception:0, metabolism:0, immunity:0, camouflage:0, fecundity:0 };
     let a=0,b=0,c=0,d=0,e=0,f=0,h=0;
     for(let i=0;i<n;i++){
-      const g=this.creatures[i].genes;
+      const g=list[i].genes;
       a+=g.speed; b+=g.size; c+=g.perception; d+=g.metabolism;
       e+=g.immunity; f+=g.camouflage; h+=g.fecundity;
     }
@@ -1222,15 +1281,17 @@ class World {
   }
   researchMetrics(){
     const genes=['speed','size','perception','metabolism','immunity','camouflage','fecundity'];
-    const n=this.creatures.length;
+    // Mọi chỉ số di truyền tính trên loài ăn cỏ — quần thể được nghiên cứu.
+    const list=this.herbivores();
+    const n=list.length;
     const geneVariance={};
     let diversity=0, meanEnergy=0;
     for(const key of genes){
       let mean=0;
-      for(const c of this.creatures) mean+=c.genes[key];
+      for(const c of list) mean+=c.genes[key];
       mean=n ? mean/n : 0;
       let variance=0;
-      for(const c of this.creatures){
+      for(const c of list){
         const d=c.genes[key]-mean;
         variance+=d*d;
       }
@@ -1240,15 +1301,24 @@ class World {
       diversity+=span ? Math.sqrt(variance)/span : 0;
     }
     const lineages=new Map();
-    for(const c of this.creatures){
+    for(const c of list){
       meanEnergy+=c.energy;
       lineages.set(c.lineage,(lineages.get(c.lineage)||0)+1);
     }
     let concentration=0;
     if(n) for(const count of lineages.values()) concentration+=(count/n)*(count/n);
+    const carnivores=this.carnivores();
     return {
       day:this.day,
       population:n,
+      // Ba bậc: thảm thực vật trưởng thành, loài ăn cỏ, loài ăn thịt.
+      trophic:{
+        plants:this.food.length,
+        plantsGrown:this.food.reduce((total,plant)=>total+(plant.growth>=1?1:0),0),
+        herbivores:n,
+        carnivores:carnivores.length
+      },
+      carnivoreStats:carnivores.length ? this.stats(carnivores) : null,
       geneticDiversity:diversity/genes.length,
       // Thành công sinh sản trọn đời: số con trung bình của những cá thể đã
       // chết, tức đã sống hết đời. Thay cho công thức fitness tự đặt trước đây.
@@ -1331,18 +1401,19 @@ class World {
   selectionDifferentials(){
     const genes=['speed','size','perception','metabolism','immunity','camouflage','fecundity'];
     const out={};
-    const n=this.creatures.length;
+    const list=this.herbivores();
+    const n=list.length;
     if(!n){ for(const key of genes) out[key]=0; return out; }
     let meanW=0;
-    for(const c of this.creatures) meanW+=c.offspringToday;
+    for(const c of list) meanW+=c.offspringToday;
     meanW/=n;
     for(const key of genes){
       if(meanW<=0){ out[key]=0; continue; }
       let meanZ=0;
-      for(const c of this.creatures) meanZ+=c.genes[key];
+      for(const c of list) meanZ+=c.genes[key];
       meanZ/=n;
       let cov=0;
-      for(const c of this.creatures) cov+=(c.offspringToday-meanW)*(c.genes[key]-meanZ);
+      for(const c of list) cov+=(c.offspringToday-meanW)*(c.genes[key]-meanZ);
       out[key]=cov/n/meanW;
     }
     return out;
@@ -1887,12 +1958,19 @@ globalThis.DarwinEngine = {
       const wobble=Math.sin(creature.wobble)*radius*.06;
       ctx.fillStyle='rgba(55,46,30,.14)';
       ctx.beginPath();ctx.ellipse(creature.x+2,creature.y+radius*.72,radius*.9,radius*.32,0,0,Math.PI*2);ctx.fill();
-      ctx.fillStyle=`rgb(${color[0]},${color[1]},${color[2]})`;
+      const hunter=creature.species==='carnivore';
+      ctx.fillStyle=hunter
+        ? `rgb(${Math.round(color[0]*.42+120)},${Math.round(color[1]*.28)},${Math.round(color[2]*.3)})`
+        : `rgb(${color[0]},${color[1]},${color[2]})`;
       ctx.globalAlpha=.82+camouflage*.18;
       ctx.beginPath();ctx.ellipse(creature.x,creature.y,radius+wobble,(radius-wobble)*.86,0,0,Math.PI*2);ctx.fill();
       ctx.globalAlpha=1;
       ctx.fillStyle='rgba(255,255,255,.2)';
       ctx.beginPath();ctx.ellipse(creature.x,creature.y-radius*.25,radius*.68,radius*.3,0,0,Math.PI*2);ctx.fill();
+      if(hunter){   // viền sẫm để phân biệt loài ăn thịt ngay trên sân
+        ctx.strokeStyle='rgba(58,14,18,.75)';ctx.lineWidth=1.4;
+        ctx.beginPath();ctx.ellipse(creature.x,creature.y,radius+1,(radius+1)*.86,0,0,Math.PI*2);ctx.stroke();
+      }
       if(selected&&selected.id===creature.id){
         ctx.strokeStyle='#173c32';ctx.lineWidth=2;
         ctx.beginPath();ctx.ellipse(creature.x,creature.y,radius+4,(radius+4)*.86,0,0,Math.PI*2);ctx.stroke();

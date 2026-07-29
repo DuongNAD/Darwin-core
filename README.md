@@ -124,22 +124,11 @@ gene theo từng ngày.
 
 ## Hạn chế đã biết
 
-- **Ngụy trang không được chọn lọc trong `predator`, và điều đó không sửa được
-  bằng tham số.** Đã thử sáu cấu hình: tăng sức ngụy trang từ 0.68 lên 0.99 (khả
-  năng bị phát hiện còn 1%) và cắt chi phí xuống một phần tư — chênh lệch so với
-  đối chứng chưa lần nào vượt khỏi khoảng tin cậy chứa 0, trong khi kích thước
-  luôn +1.7 đến +1.9. Nguyên nhân có tính cấu trúc: săn mồi đòi hỏi kẻ săn lớn
-  hơn con mồi 1.5 lần, nên **vượt ngưỡng kích thước là thoát tuyệt đối**, còn
-  ngụy trang chỉ cứu được những cá thể vốn đã thua vì nhỏ.
-
-  Cách sửa hiển nhiên — bỏ ngưỡng cứng, cho xác suất săn tăng dần theo tỉ lệ
-  kích thước — **đã được thử và không hiệu quả**. Ba biến thể độ dốc ở 24 bản
-  lặp đưa săn mồi từ 19% lên ~50% số ca chết mà ngụy trang vẫn không nhích:
-  +0.074 [−0.022, 0.169] ở cấu hình tốt nhất. (Ở 10 bản lặp cấu hình đó cho
-  +0.232 "có ý nghĩa" — một dương tính giả, và là lý do đừng tin một lần chạy.)
-  Kích thước được thưởng kép: vừa là vũ khí tấn công vừa là áo giáp, nên mọi
-  khoản đầu tư phòng thủ đơn thuần đều bị lấn át. Muốn ngụy trang có chỗ đứng
-  thì phải tách hai vai trò đó ra, chứ không chỉ làm mềm ngưỡng.
+- **Hệ săn mồi–con mồi sụp hẳn ở khoảng 1/12 hạt giống.** Đo trên 12 bản chạy
+  40 ngày: 10 bản giữ đủ ba bậc, 1 bản mất loài ăn thịt, 1 bản mất cả hai bậc
+  động vật và thảm thực vật phủ kín tới trần. Đây là bất ổn thật của hệ săn
+  mồi–con mồi chứ không phải lỗi, nhưng nếu bạn chạy `predator` một lần và thấy
+  quần thể chết sạch thì đó là lý do — hãy chạy nhiều bản lặp.
 - **`abundance` không giữ được đa dạng cao hơn đối chứng**, và cơ chế cân bằng
   đã thử cũng không cứu được. Phân chia tài nguyên (hai loại thức ăn, cá thể nhỏ
   khai thác tốt loại này, cá thể lớn khai thác tốt loại kia) **có** tạo ra chọn
