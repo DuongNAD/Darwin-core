@@ -516,6 +516,17 @@ const clamp = (v,a,b)=> v<a?a:(v>b?b:v);
 const METABOLIC_LOAD = 2;
 const METABOLIC_SCALE = 0.793858;
 const GENE_KEYS = ['speed','size','perception','metabolism','immunity','camouflage','fecundity'];
+// Thực vật là bậc sản xuất: hạt rơi xuống rồi lớn dần, cây trưởng thành gieo
+// tiếp quanh mình. Nhờ vậy một vùng bị gặm trụi phải chờ hồi phục thay vì được
+// nạp lại đầy mỗi sáng, và sức chứa của môi trường tự nổi lên thay vì bị áp đặt.
+// Mầm non KHÔNG ăn được. Đây là điều kiện để cơ chế có ý nghĩa: nếu mầm cũng
+// ăn được thì áp lực gặm nuốt sạch chúng trước khi kịp lớn (đo được: 0% cây đạt
+// trưởng thành), không cây nào gieo hạt, và thực vật chỉ còn là thức ăn đổi tên.
+// Khi mầm bất khả xâm phạm, vùng bị gặm trụi thật sự hết ăn cho tới lứa sau,
+// nên đàn buộc phải di chuyển và sức chứa môi trường tự nổi lên.
+const PLANT_MATURITY = 200;      // số nhịp để một mầm thành cây trưởng thành
+const PLANT_SPREAD = 0.22;       // xác suất mỗi ngày một cây trưởng thành gieo hạt
+const PLANT_SPREAD_RADIUS = 46;  // hạt rơi gần cây mẹ, nên thảm thực vật thành từng đám
 const SCENARIOS = {
   baseline: {
     name: 'Đối chứng tự nhiên',
@@ -554,7 +565,7 @@ const SCENARIOS = {
   },
   extinction: {
     name: 'Đại tuyệt chủng',
-    hypothesis: 'Một cú sốc quét sạch phần lớn quần thể, nhưng đột biến cao sau đó xoá dấu thắt cổ chai trong đa dạng.',
+    hypothesis: 'Một cú sốc quét sạch phần lớn quần thể, nhưng đột biến cao sau đó đẩy đa dạng lên trên cả mức đối chứng.',
     params: { foodPerDay:150, mutation:0.22, costMul:1, predation:false, extinction:true }
   }
 };
@@ -639,7 +650,8 @@ class World {
         120, 1, 0
       ));
     }
-    this.spawnFood(180);
+    // Ngày đầu bắt đầu bằng thảm thực vật đã trưởng thành, không phải hạt.
+    this.spawnFood(180, 1);
     this.record();
   }
   createZones(){
@@ -812,7 +824,9 @@ class World {
     }
     return order;
   }
-  spawnFood(n){
+  // growth = 0 là hạt vừa rơi, = 1 là cây trưởng thành.
+  spawnFood(n, growth){
+    const maturity = growth === undefined ? 0 : clamp(growth, 0, 1);
     const room = Math.max(0, FOOD_CAP - this.food.length);
     n = Math.min(n, room);
     const nutrients=this.zones.filter(z=>z.type==='nutrient');
@@ -849,7 +863,38 @@ class World {
             this.rr(Math.min(this.W-15,drought.x+drought.w+5),this.W-14);
         }
       }
-      this.food.push({x,y});
+      this.food.push({x,y,growth:maturity});
+    }
+  }
+  // Cây lớn dần mỗi nhịp — không tốn RNG nên rẻ. Việc gieo hạt chỉ làm mỗi
+  // ngày một lần, vừa đủ để thảm thực vật lan ra mà không đốt RNG mỗi nhịp.
+  growPlants(){
+    const step = 1/PLANT_MATURITY;
+    const plants = this.food;
+    for(let i=0;i<plants.length;i++){
+      const p = plants[i];
+      if(p.growth < 1){
+        p.growth += step;
+        if(p.growth > 1) p.growth = 1;
+      }
+    }
+  }
+  seedPlants(){
+    const plants = this.food;
+    const grown = [];
+    for(let i=0;i<plants.length;i++) if(plants[i].growth >= 1) grown.push(plants[i]);
+    let room = Math.max(0, FOOD_CAP - plants.length);
+    for(let i=0;i<grown.length && room>0;i++){
+      if(this.rand() >= PLANT_SPREAD) continue;
+      const parent = grown[i];
+      const angle = this.rr(0, Math.PI*2);
+      const distance = this.rr(8, PLANT_SPREAD_RADIUS);
+      const x = clamp(parent.x + Math.cos(angle)*distance, 14, this.W-14);
+      const y = clamp(parent.y + Math.sin(angle)*distance, 14, this.H-14);
+      // rào cách ly chặn cả hạt: hai đảo không trao đổi thực vật
+      if(this.params.islands && x > this.W*0.47 && x < this.W*0.53) continue;
+      plants.push({x,y,growth:0});
+      room--;
     }
   }
   // --- spatial hash ---
@@ -890,6 +935,7 @@ class World {
     const buf = [];
     const eatenFood = new Set();
     const crowd = cs.length > SOFT_CAP ? 1 + (cs.length-SOFT_CAP)/SOFT_CAP : 1;
+    this.growPlants();
     const order = this.visitOrder(cs.length);
 
     for(let step=0;step<order.length;step++){
@@ -905,6 +951,7 @@ class World {
       for(let k=0;k<buf.length;k++){
         const fi = buf[k]; if(eatenFood.has(fi)) continue;
         const f = this.food[fi];
+        if(f.growth < 1) continue;   // mầm chưa ăn được nên cũng không đáng đi tới
         const d = (f.x-c.x)*(f.x-c.x) + (f.y-c.y)*(f.y-c.y);
         if(d < best && d < per*per){ best=d; tx=f.x; ty=f.y; }
       }
@@ -955,6 +1002,7 @@ class World {
       for(let k=0;k<buf.length;k++){
         const fi = buf[k]; if(eatenFood.has(fi)) continue;
         const f = this.food[fi];
+        if(f.growth < 1) continue;
         if((f.x-c.x)*(f.x-c.x) + (f.y-c.y)*(f.y-c.y) < reach*reach){
           eatenFood.add(fi);
           c.energy = Math.min(c.maxEnergy, c.energy + FOOD_ENERGY);
@@ -1090,6 +1138,7 @@ class World {
       this.day++;
       this.applyDayDynamics();
       this.spawnFood(Math.round(this.params.foodPerDay*this.environment.resourceIndex));
+      this.seedPlants();
       this.record();
     }
   }
@@ -1811,10 +1860,15 @@ globalThis.DarwinEngine = {
       ctx.fillRect(0,0,width,height);
     }
 
-    ctx.fillStyle='#5c8f5a';
-    for(const food of target.food){
-      ctx.beginPath();ctx.arc(food.x,food.y,2.45,0,Math.PI*2);ctx.fill();
+    // Mầm non nhỏ và nhạt, cây trưởng thành to và đậm — nhìn là thấy vùng nào
+    // vừa bị gặm trụi và vùng nào đã hồi phục.
+    for(const plant of target.food){
+      const growth=plant.growth ?? 1;
+      ctx.globalAlpha=0.45+growth*0.55;
+      ctx.fillStyle=growth>=1 ? '#5c8f5a' : '#8fb27a';
+      ctx.beginPath();ctx.arc(plant.x,plant.y,1.1+growth*1.45,0,Math.PI*2);ctx.fill();
     }
+    ctx.globalAlpha=1;
 
     const selected=isPrimary&&selectedId!==null ?
       target.creatures.find(creature=>creature.id===selectedId):null;

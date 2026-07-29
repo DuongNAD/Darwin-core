@@ -42,6 +42,29 @@ Riêng trao đổi chất có **điểm tối ưu nằm giữa dải** chứ kh�
 thể, mỗi môi trường chọn một chiến lược khác nhau — kịch bản dồi dào chọn trao
 đổi chất tiết kiệm, kịch bản khan hiếm chọn đốt nhanh.
 
+## Thực vật là bậc sản xuất
+
+Thức ăn không rơi từ trời xuống mỗi sáng nữa. Hạt gieo xuống, lớn dần trong 200
+nhịp, và cây trưởng thành gieo tiếp quanh mình — nên thảm thực vật mọc thành
+từng đám thay vì rải đều.
+
+Điểm quyết định: **mầm non không ăn được**. Bản đầu tiên cho mầm ăn được với ít
+năng lượng hơn, và cơ chế chết ngay — đo được **0% cây kịp trưởng thành**, vì áp
+lực gặm nuốt sạch chúng trước khi lớn. Không cây nào gieo được hạt, mọi thứ bị
+ăn ở mức năng lượng thấp nhất, quần thể tụt 70%. Thực vật khi đó chỉ là thức ăn
+cũ đổi tên.
+
+Khi mầm bất khả xâm phạm, một vùng bị gặm trụi thật sự hết ăn cho tới lứa sau,
+nên đàn buộc phải di chuyển và sức chứa môi trường tự nổi lên thay vì bị áp đặt
+bằng một con số mỗi ngày. Ở tham số hiện tại, 43% thảm phủ đạt trưởng thành —
+đủ để cơ chế sống mà vẫn còn áp lực gặm thật sự. Quần thể nằm trong khoảng
+118–178% mức cũ và không kịch bản nào tuyệt chủng.
+
+Rào cách ly ở kịch bản `islands` chặn cả hạt, nên hai đảo không trao đổi thực
+vật. Toàn bộ bảy giả thuyết vẫn được dữ liệu ủng hộ sau thay đổi này, trừ
+`extinction` phải sửa lại: đột biến cao không chỉ xoá dấu thắt cổ chai mà đẩy đa
+dạng lên trên cả mức đối chứng (+0.026).
+
 ## Tám kịch bản
 
 `baseline` · `scarcity` · `abundance` · `predator` · `climate` · `epidemic` ·
