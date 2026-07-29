@@ -176,6 +176,18 @@
   .compare-table{display:grid;grid-template-columns:1fr auto auto;gap:6px 10px;font-size:10.5px}
   .compare-table .head{color:var(--ink-faint);font:9.5px var(--mono)}
   .compare-table .num{font:10.5px var(--mono);text-align:right}
+  /* ---------- control desk ---------- */
+  .control-row{display:grid;grid-template-columns:1fr 74px auto;gap:6px;align-items:center;margin-bottom:8px}
+  .control-row select,.control-row input{background:rgba(255,255,255,.05);color:var(--ink);
+    border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:5px 7px;font:11.5px var(--mono)}
+  .control-frac{font-size:11px;color:var(--ink-dim);display:flex;align-items:center;gap:4px;white-space:nowrap}
+  .control-frac input{width:52px}
+  .control-actions{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+  .control-actions button{flex:1;min-width:96px}
+  .intervention-log{max-height:132px;overflow-y:auto;margin-top:8px;display:flex;flex-direction:column;gap:4px}
+  .intervention-log div{font:10.5px var(--mono);color:var(--ink-dim);
+    border-left:2px solid var(--size);padding-left:7px;line-height:1.45}
+  .intervention-log .event-empty{border-left-color:transparent;color:var(--ink-faint)}
   /* ---------- replicate study ---------- */
   .replicate-setup{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
   .replicate-setup label{display:block;font-size:11.5px;color:var(--ink-dim)}
@@ -355,6 +367,36 @@
       <h2>SO SÁNH ĐỐI CHỨNG A/B</h2>
       <div class="compare-table" id="comparisonTable"></div>
       <div class="tip">Đây là kết quả của một lần chạy duy nhất. Muốn phát biểu về kịch bản, hãy chạy nhiều bản lặp bên dưới.</div>
+    </section>
+
+    <section class="card glass">
+      <h2>BÀN ĐIỀU KHIỂN</h2>
+      <div class="control-row">
+        <select id="ctlGene" aria-label="Chọn gene để can thiệp">
+          <option value="speed">Tốc độ</option>
+          <option value="size">Kích thước</option>
+          <option value="perception">Cảm nhận</option>
+          <option value="metabolism">Trao đổi chất</option>
+          <option value="immunity">Miễn dịch</option>
+          <option value="camouflage">Ngụy trang</option>
+          <option value="fecundity">Sinh sản</option>
+        </select>
+        <input type="number" id="ctlValue" step="0.05" aria-label="Giá trị gene">
+        <label class="control-frac">cho <input type="number" id="ctlFraction" min="1" max="100" step="5" value="100" aria-label="Phần trăm quần thể">%</label>
+      </div>
+      <div class="control-actions">
+        <button id="ctlSet">Đặt gene</button>
+        <button id="ctlNudgeUp">Dịch +10%</button>
+        <button id="ctlNudgeDown">Dịch −10%</button>
+      </div>
+      <div class="control-actions">
+        <button id="ctlInject">Tiêm 20 cá thể</button>
+        <button id="ctlCull">Loại bỏ 50%</button>
+        <button id="ctlFood">Thêm 200 thức ăn</button>
+      </div>
+      <div class="tip">Mọi thao tác ở đây được ghi vào nhật ký can thiệp và đi theo dữ liệu xuất ra — một lần chạy có can thiệp không thể bị nhầm với một lần chạy sạch.</div>
+      <div class="intervention-log" id="interventionLog"><div class="event-empty">Chưa có can thiệp nào.</div></div>
+      <div class="tip">Cùng API này có ở <code>window.DarwinControl</code>: <code>state()</code>, <code>genePool()</code>, <code>inject()</code>, <code>setGene()</code>, <code>nudgeGene()</code>, <code>cull()</code>, <code>setParam()</code>, <code>addFood()</code>, <code>advance()</code>, <code>log()</code>.</div>
     </section>
 
     <section class="card glass">
@@ -576,6 +618,10 @@ class World {
     this.completedLives = { count:0, offspring:0 };
     // chênh lệch chọn lọc của ngày vừa khép lại
     this.lastSelection = this.zeroSelection();
+    // Nhật ký can thiệp thủ công. Một lần chạy có bàn tay người nhúng vào
+    // không được phép trông giống một lần chạy sạch, nên mọi thao tác qua
+    // Controller đều để lại dấu ở đây và trong dữ liệu xuất ra.
+    this.interventions = [];
     this.history = [];
     for(let i=0;i<45;i++){
       this.creatures.push(new Creature(
@@ -687,6 +733,7 @@ class World {
       births:this.births,deaths:this.deaths,maxGen:this.maxGen,
       completedLives:{...this.completedLives},
       lastSelection:{...this.lastSelection},
+      interventions:this.interventions.map(entry=>({...entry})),
       extinctionTriggered:this.extinctionTriggered,
       params:{...this.params},
       environment:{...this.environment},
@@ -709,6 +756,7 @@ class World {
     w.births=data.births; w.deaths=data.deaths; w.maxGen=data.maxGen;
     w.completedLives={count:0,offspring:0,...(data.completedLives||{})};
     w.lastSelection={...w.zeroSelection(),...(data.lastSelection||{})};
+    w.interventions=(data.interventions||[]).map(entry=>({...entry}));
     w.extinctionTriggered=!!data.extinctionTriggered;
     w.params={...data.params};
     w.environment={...data.environment};
@@ -1415,6 +1463,8 @@ function exportExperiment(world,format){
     metrics:world.researchMetrics(),
     history:world.history.map(row=>({...row})),
     events:world.eventLog.map(event=>({...event})),
+    // Bản chạy có can thiệp thủ công phải mang dấu vết đó theo dữ liệu.
+    interventions:world.interventions.map(entry=>({...entry})),
     creatures:world.creatures.map(c=>({
       id:c.id,lineage:c.lineage,parentId:c.parentId,generation:c.gen,
       age:c.age,energy:c.energy,offspring:c.offspring,genes:{...c.genes}
@@ -1438,8 +1488,175 @@ function exportExperiment(world,format){
   }
   return JSON.stringify(data,null,2);
 }
+// ===== CỔNG ĐIỀU KHIỂN =====
+// Một lớp mỏng, thuần dữ liệu, để can thiệp vào quần thể đang chạy. Mọi phương
+// thức nhận và trả về giá trị JSON thuần, nên cùng một API này dùng được cho
+// bảng điều khiển trong trang lẫn cho một MCP server bọc ngoài sau này.
+// Phương thức ĐỌC không ghi nhật ký; phương thức GHI thì luôn ghi.
+class Controller {
+  constructor(resolveWorld){ this.resolveWorld = resolveWorld; }
+  get world(){ return this.resolveWorld(); }
+
+  note(action, detail){
+    const w = this.world;
+    const entry = { day:w.day, tick:w.tick, action, detail };
+    w.interventions.push(entry);
+    if(w.interventions.length > 200) w.interventions.shift();
+    w.logEvent('intervention', 'Can thiệp — '+action, detail);
+    return entry;
+  }
+
+  // ---------- đọc ----------
+  state(){
+    const w = this.world, m = w.researchMetrics(), s = w.stats();
+    return {
+      scenario:w.scenarioId, seed:w.seed, day:w.day, tick:w.tick,
+      population:m.population, food:w.food.length,
+      births:w.births, deaths:w.deaths, maxGeneration:w.maxGen,
+      reproduction:w.params.sexual ? 'sexual' : 'asexual',
+      geneticDiversity:m.geneticDiversity,
+      effectiveLineages:m.effectiveLineages,
+      meanOffspring:m.meanOffspring,
+      differentiation:m.differentiation ? m.differentiation.mean : null,
+      environment:{...w.environment},
+      params:{...w.params},
+      deathCauses:{...m.deathCauses},
+      interventions:w.interventions.length
+    };
+  }
+  genePool(){
+    const w = this.world, out = {};
+    const stats = w.stats(), variance = w.researchMetrics().geneVariance;
+    for(const key of GENE_KEYS){
+      let low = Infinity, high = -Infinity;
+      for(const c of w.creatures){
+        if(c.genes[key] < low) low = c.genes[key];
+        if(c.genes[key] > high) high = c.genes[key];
+      }
+      out[key] = {
+        mean:stats[key] || 0,
+        sd:Math.sqrt(Math.max(0, variance[key] || 0)),
+        min:w.creatures.length ? low : null,
+        max:w.creatures.length ? high : null,
+        range:[...RANGE[key]]
+      };
+    }
+    return out;
+  }
+  listCreatures(limit){
+    const n = Math.max(1, Math.min(limit || 20, this.world.creatures.length));
+    return this.world.creatures.slice(0, n).map(c=>({
+      id:c.id, generation:c.gen, lineage:c.lineage, age:c.age,
+      energy:c.energy, offspring:c.offspring, genes:{...c.genes}
+    }));
+  }
+  history(days){
+    const rows = this.world.history;
+    const n = Math.max(1, Math.min(days || 30, rows.length));
+    return rows.slice(-n).map(row=>({...row}));
+  }
+
+  // ---------- ghi ----------
+  // Bổ sung cá thể mang bộ gene chỉ định; gene nào bỏ trống thì lấy từ quần thể
+  // hiện tại, hoặc từ giữa dải nếu quần thể đã chết.
+  inject(spec){
+    const w = this.world;
+    const count = Math.max(1, Math.min((spec && spec.count) || 1, 200));
+    const wanted = (spec && spec.genes) || {};
+    const stats = w.stats();
+    const born = [];
+    for(let i=0;i<count;i++){
+      const genes = {};
+      for(const key of GENE_KEYS){
+        const fallback = w.creatures.length ? stats[key] : (RANGE[key][0]+RANGE[key][1])/2;
+        const value = wanted[key] !== undefined ? Number(wanted[key]) : fallback;
+        genes[key] = clamp(value, RANGE[key][0], RANGE[key][1]);
+      }
+      const creature = new Creature(
+        w.nextId++,
+        clamp(spec && spec.x !== undefined ? spec.x : w.rr(20, w.W-20), 6, w.W-6),
+        clamp(spec && spec.y !== undefined ? spec.y : w.rr(20, w.H-20), 6, w.H-6),
+        genes,
+        (spec && spec.energy) || 110,
+        w.day, 0
+      );
+      creature.heading = w.rr(0, Math.PI*2);
+      w.creatures.push(creature);
+      born.push(creature.id);
+    }
+    this.note('tiêm cá thể', `${count} cá thể, gene đặt: ${Object.keys(wanted).join(', ') || 'không'}`);
+    return { injected:born.length, ids:born, population:w.creatures.length };
+  }
+  // Đặt thẳng một gene cho một phần quần thể — dùng để tạo đột biến nhân tạo.
+  setGene(key, value, options){
+    const w = this.world;
+    if(!GENE_KEYS.includes(key)) throw new Error('gene không tồn tại: '+key);
+    const fraction = clamp((options && options.fraction) ?? 1, 0, 1);
+    const target = clamp(Number(value), RANGE[key][0], RANGE[key][1]);
+    let touched = 0;
+    for(const c of w.creatures){
+      if(w.rand() > fraction) continue;
+      c.genes[key] = target;
+      touched++;
+    }
+    this.note('đặt gene', `${key} = ${target.toFixed(3)} cho ${touched} cá thể`);
+    return { gene:key, value:target, touched };
+  }
+  // Dịch chuyển gene theo một lượng — mô phỏng áp lực chọn giống nhân tạo.
+  nudgeGene(key, delta, options){
+    const w = this.world;
+    if(!GENE_KEYS.includes(key)) throw new Error('gene không tồn tại: '+key);
+    const fraction = clamp((options && options.fraction) ?? 1, 0, 1);
+    let touched = 0;
+    for(const c of w.creatures){
+      if(w.rand() > fraction) continue;
+      c.genes[key] = clamp(c.genes[key] + Number(delta), RANGE[key][0], RANGE[key][1]);
+      touched++;
+    }
+    this.note('dịch gene', `${key} ${delta>=0?'+':''}${Number(delta).toFixed(3)} cho ${touched} cá thể`);
+    return { gene:key, delta:Number(delta), touched };
+  }
+  // Loại bỏ ngẫu nhiên một phần quần thể — thắt cổ chai do người tạo ra.
+  cull(options){
+    const w = this.world;
+    const fraction = clamp((options && options.fraction) ?? 0.5, 0, 1);
+    const survivors = [];
+    let removed = 0;
+    for(const c of w.creatures){
+      if(w.rand() < fraction){ removed++; w.deaths++; w.deathCauses.catastrophe++;
+        w.completedLives.count++; w.completedLives.offspring += c.offspring; }
+      else survivors.push(c);
+    }
+    w.creatures = survivors;
+    this.note('loại bỏ', `${removed} cá thể (${(fraction*100).toFixed(0)}%)`);
+    return { removed, population:w.creatures.length };
+  }
+  setParam(key, value){
+    const w = this.world;
+    if(!(key in w.params)) throw new Error('tham số không tồn tại: '+key);
+    const before = w.params[key];
+    w.params[key] = typeof before === 'boolean' ? !!value : Number(value);
+    this.note('đổi tham số', `${key}: ${before} → ${w.params[key]}`);
+    return { param:key, from:before, to:w.params[key] };
+  }
+  addFood(n){
+    const w = this.world;
+    const before = w.food.length;
+    w.spawnFood(Math.max(1, Math.min(Number(n)||50, 600)));
+    this.note('thêm thức ăn', `${w.food.length-before} đơn vị`);
+    return { added:w.food.length-before, food:w.food.length };
+  }
+  advance(days){
+    const w = this.world;
+    const count = Math.max(1, Math.min(Number(days)||1, 60));
+    w.runTicks(TICKS_PER_DAY*count);
+    return { day:w.day, population:w.creatures.length };
+  }
+  log(){ return this.world.interventions.map(entry=>({...entry})); }
+}
+
 globalThis.DarwinEngine = {
-  World, Creature, ComparisonStudy, exportExperiment,
+  World, Creature, ComparisonStudy, Controller, exportExperiment, GENE_KEYS,
   SCENARIOS, RANGE, TICKS_PER_DAY, SIM_WIDTH, SIM_HEIGHT, clamp, mulberry32,
   REPLICATE_FIELDS, summarize, welchDifference, replicateStudy,
   runReplicates, aggregateReplicates
@@ -1859,6 +2076,8 @@ globalThis.DarwinEngine = {
     worldB=compareMode?new World({seed,scenario:scenarioB,sexual:sexualMode}):null;
     selectedId=null;
     syncControls();
+    syncControlValue();
+    updateInterventions();
     resizeArena();
     draw();hud();
   }
@@ -2088,6 +2307,41 @@ self.onmessage=function(event){
     setTimeout(runOne,0);
   }
 
+  // ---------- bàn điều khiển ----------
+  // Cùng một Controller phục vụ cả panel lẫn console; MCP server sau này chỉ
+  // cần bọc đúng các phương thức này lại.
+  const control=new Controller(()=>world);
+  globalThis.DarwinControl=control;
+
+  function updateInterventions(){
+    const box=$('#interventionLog');
+    const entries=control.log();
+    if(!entries.length){
+      box.innerHTML='<div class="event-empty">Chưa có can thiệp nào.</div>';
+      return;
+    }
+    box.innerHTML=entries.slice(-12).reverse()
+      .map(entry=>`<div>NGÀY ${entry.day} · ${entry.action} — ${entry.detail}</div>`).join('');
+  }
+
+  function afterIntervention(message){
+    updateInterventions();
+    draw();hud();
+    notify(message);
+  }
+
+  function controlGene(){ return $('#ctlGene').value; }
+  function controlFraction(){ return clamp((+$('#ctlFraction').value||100)/100,0,1); }
+
+  function syncControlValue(){
+    const key=controlGene();
+    const field=$('#ctlValue');
+    const [low,high]=RANGE[key];
+    field.min=low; field.max=high;
+    field.step=key==='perception' ? 5 : 0.05;
+    field.value=(world.stats()[key]||((low+high)/2)).toFixed(key==='perception'?0:2);
+  }
+
   function loop(now){
     const elapsed=Math.min(100,now-last);last=now;
     let stepped=0;
@@ -2162,6 +2416,39 @@ self.onmessage=function(event){
   $('#rFood').addEventListener('input',event=>{world.params.foodPerDay=+event.target.value;$('#vFood').textContent=event.target.value;});
   $('#rMut').addEventListener('input',event=>{world.params.mutation=+event.target.value/100;$('#vMut').textContent=event.target.value+'%';});
   $('#rCost').addEventListener('input',event=>{world.params.costMul=+event.target.value/100;$('#vCost').textContent=world.params.costMul.toFixed(2)+'x';});
+  $('#ctlGene').addEventListener('change',syncControlValue);
+  $('#ctlSet').addEventListener('click',()=>{
+    const key=controlGene();
+    const result=control.setGene(key,+$('#ctlValue').value,{fraction:controlFraction()});
+    afterIntervention(`Đặt ${key} = ${result.value.toFixed(2)} cho ${result.touched} cá thể`);
+  });
+  $('#ctlNudgeUp').addEventListener('click',()=>{
+    const key=controlGene();
+    const span=RANGE[key][1]-RANGE[key][0];
+    const result=control.nudgeGene(key,span*0.1,{fraction:controlFraction()});
+    afterIntervention(`Dịch ${key} lên cho ${result.touched} cá thể`);
+    syncControlValue();
+  });
+  $('#ctlNudgeDown').addEventListener('click',()=>{
+    const key=controlGene();
+    const span=RANGE[key][1]-RANGE[key][0];
+    const result=control.nudgeGene(key,-span*0.1,{fraction:controlFraction()});
+    afterIntervention(`Dịch ${key} xuống cho ${result.touched} cá thể`);
+    syncControlValue();
+  });
+  $('#ctlInject').addEventListener('click',()=>{
+    const key=controlGene();
+    const result=control.inject({count:20,genes:{[key]:+$('#ctlValue').value}});
+    afterIntervention(`Đã tiêm ${result.injected} cá thể`);
+  });
+  $('#ctlCull').addEventListener('click',()=>{
+    const result=control.cull({fraction:0.5});
+    afterIntervention(`Đã loại bỏ ${result.removed} cá thể`);
+  });
+  $('#ctlFood').addEventListener('click',()=>{
+    const result=control.addFood(200);
+    afterIntervention(`Đã thêm ${result.added} thức ăn`);
+  });
   $('#rReplicates').addEventListener('input',event=>{$('#vReplicates').textContent=event.target.value;});
   $('#rRepDays').addEventListener('input',event=>{$('#vRepDays').textContent=event.target.value;});
   $('#btnReplicate').addEventListener('click',startReplicates);
@@ -2195,6 +2482,8 @@ self.onmessage=function(event){
   observer.observe(arena.parentElement);
 
   syncControls();
+  syncControlValue();
+  updateInterventions();
   resizeArena();
   draw();
   hud();
