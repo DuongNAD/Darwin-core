@@ -9,7 +9,7 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "vinext start",
-    "test": "npm run build && node --test tests/rendered-html.test.mjs tests/research-engine.test.mjs tests/research-ui.test.mjs tests/research-integrity.test.mjs tests/golden-master.test.mjs tests/control-api.test.mjs tests/ecosystem.test.mjs",
+    "test": "npm run build && node --test tests/rendered-html.test.mjs tests/research-engine.test.mjs tests/research-ui.test.mjs tests/research-integrity.test.mjs tests/golden-master.test.mjs tests/control-api.test.mjs tests/ecosystem.test.mjs tests/mcp-server.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"
   },
@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
@@ -35,7 +36,8 @@
     "typescript": "5.9.3",
     "vinext": "0.0.50",
     "vite": "8.0.13",
-    "wrangler": "4.92.0"
+    "wrangler": "4.92.0",
+    "zod": "^4.4.3"
   },
   "type": "module"
 }

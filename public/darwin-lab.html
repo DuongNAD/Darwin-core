@@ -1639,6 +1639,9 @@ class Controller {
     return {
       scenario:w.scenarioId, seed:w.seed, day:w.day, tick:w.tick,
       population:m.population, food:w.food.length,
+      // Ba bậc dinh dưỡng — không có khối này thì cổng điều khiển giấu mất
+      // một nửa hệ sinh thái mà engine đang mô phỏng.
+      trophic:{...m.trophic},
       births:w.births, deaths:w.deaths, maxGeneration:w.maxGen,
       reproduction:w.params.sexual ? 'sexual' : 'asexual',
       geneticDiversity:m.geneticDiversity,
@@ -1673,10 +1676,12 @@ class Controller {
     }
     return out;
   }
-  listCreatures(limit){
-    const n = Math.max(1, Math.min(limit || 20, this.world.creatures.length));
-    return this.world.creatures.slice(0, n).map(c=>({
-      id:c.id, generation:c.gen, lineage:c.lineage, age:c.age,
+  listCreatures(limit, offset){
+    const all = this.world.creatures;
+    const start = Math.max(0, Math.min(offset || 0, all.length));
+    const n = Math.max(1, Math.min(limit || 20, Math.max(1, all.length - start)));
+    return all.slice(start, start + n).map(c=>({
+      id:c.id, species:c.species, generation:c.gen, lineage:c.lineage, age:c.age,
       energy:c.energy, offspring:c.offspring, genes:{...c.genes}
     }));
   }

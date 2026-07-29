@@ -149,6 +149,25 @@ gene theo từng ngày.
 - Tính trạng là số thực liên tục, không phải allele. Mọi phát biểu về di truyền
   quần thể ở đây là phát biểu về **tính trạng số lượng**.
 
+## Điều khiển từ bên ngoài
+
+Thẻ BÀN ĐIỀU KHIỂN trong trang cho phép can thiệp trực tiếp: đặt hoặc dịch một
+gene cho một phần quần thể, thả thêm cá thể ăn cỏ hoặc ăn thịt, gây thắt cổ chai,
+gieo thêm hạt. Cùng API đó nằm ở `window.DarwinControl` để gọi từ console.
+
+Cũng API đó chạy được qua MCP, để một agent lái thí nghiệm:
+
+```bash
+claude mcp add darwin-lab -- node <đường-dẫn>/mcp/server.mjs
+```
+
+Xem [mcp/README.md](mcp/README.md). Server đọc engine trực tiếp từ
+`public/darwin-lab.html` nên không có bản engine thứ hai để trôi lệch.
+
+**Mọi thao tác có tác động đều được ghi lại** — vào nhật ký can thiệp, nhật ký
+sự kiện, và dữ liệu xuất ra. Một bản chạy bị nhúng tay vào không bao giờ trông
+giống một bản chạy sạch.
+
 ## Cấu trúc
 
 ```
