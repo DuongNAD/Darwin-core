@@ -107,13 +107,28 @@ gene theo từng ngày.
   đối chứng chưa lần nào vượt khỏi khoảng tin cậy chứa 0, trong khi kích thước
   luôn +1.7 đến +1.9. Nguyên nhân có tính cấu trúc: săn mồi đòi hỏi kẻ săn lớn
   hơn con mồi 1.5 lần, nên **vượt ngưỡng kích thước là thoát tuyệt đối**, còn
-  ngụy trang chỉ cứu được những cá thể vốn đã thua vì nhỏ. Muốn ngụy trang có
-  chỗ đứng thì phải đổi bản chất của săn mồi — ví dụ bỏ ngưỡng cứng, cho xác
-  suất săn phụ thuộc tỉ lệ kích thước — chứ không phải chỉnh số.
-- **`abundance` không giữ được đa dạng cao hơn đối chứng.** Duy trì đa dạng cần
-  cơ chế cân bằng chủ động (chọn lọc phụ thuộc tần số, hoặc nhiều ổ sinh thái
-  cùng tồn tại); thức ăn dư thừa chỉ làm chọn lọc đổi hướng chứ không làm nó yếu
-  đi. Giả thuyết của kịch bản đã được viết lại theo điều nó thật sự chứng minh.
+  ngụy trang chỉ cứu được những cá thể vốn đã thua vì nhỏ.
+
+  Cách sửa hiển nhiên — bỏ ngưỡng cứng, cho xác suất săn tăng dần theo tỉ lệ
+  kích thước — **đã được thử và không hiệu quả**. Ba biến thể độ dốc ở 24 bản
+  lặp đưa săn mồi từ 19% lên ~50% số ca chết mà ngụy trang vẫn không nhích:
+  +0.074 [−0.022, 0.169] ở cấu hình tốt nhất. (Ở 10 bản lặp cấu hình đó cho
+  +0.232 "có ý nghĩa" — một dương tính giả, và là lý do đừng tin một lần chạy.)
+  Kích thước được thưởng kép: vừa là vũ khí tấn công vừa là áo giáp, nên mọi
+  khoản đầu tư phòng thủ đơn thuần đều bị lấn át. Muốn ngụy trang có chỗ đứng
+  thì phải tách hai vai trò đó ra, chứ không chỉ làm mềm ngưỡng.
+- **`abundance` không giữ được đa dạng cao hơn đối chứng**, và cơ chế cân bằng
+  đã thử cũng không cứu được. Phân chia tài nguyên (hai loại thức ăn, cá thể nhỏ
+  khai thác tốt loại này, cá thể lớn khai thác tốt loại kia) **có** tạo ra chọn
+  lọc phân hoá thật: độ lệch chuẩn của kích thước tăng từ 0.350 lên 0.487. Nhưng
+  chỉ số đa dạng tổng hợp chỉ nhích +0.020 [0.000, 0.039] ở mức thưởng năng lượng
+  2.2 và **âm** ở mức 3.2 — không ổn định, lại làm quần thể tụt 36%. Nên cơ chế
+  này không được đưa vào.
+
+  Bản thân việc đó là một phát hiện: **chỉ số đa dạng lấy trung bình bảy gene,
+  nên một gene đa hình mạnh bị pha loãng bảy lần và biến mất**. Vì vậy thẻ PHÂN
+  BỐ GENE giờ vẽ thêm dải trung bình ± một độ lệch chuẩn cho từng gene — thứ mà
+  một con số tổng hợp không bao giờ cho thấy.
 - **Vòng chạy trực tiếp ở luồng chính** (worker chỉ gánh phần lặp lại). Đo trong
   trình duyệt cho thấy điều này ổn: ngay ở trần quần thể 460 kèm sinh sản hữu
   tính, một nhịp tốn 0.614 ms, nên 4x chỉ cần ~15% một lõi và 4 nhịp mỗi khung

@@ -50,3 +50,22 @@ test("exposes all seven genes and reproducibility controls", () => {
   assert.match(html, /localStorage/);
   assert.match(html, /downloadExperiment/);
 });
+
+test("shows per-gene spread, which the aggregate diversity index hides", () => {
+  // The diversity stat averages all seven genes, so one strongly polymorphic
+  // gene is diluted sevenfold and vanishes. Each track carries its own
+  // mean +/- 1 SD band.
+  for (const id of [
+    "dSpeed",
+    "dSize",
+    "dPerc",
+    "dMetabolism",
+    "dImmunity",
+    "dCamouflage",
+    "dFecundity",
+  ]) {
+    assert.match(html, new RegExp(`class="gene-spread" id="${id}"`));
+  }
+  assert.match(html, /\.gene-spread\{position:absolute/);
+  assert.match(html, /updateGeneMeters\(stats,metrics\.selectionDifferential,metrics\.geneVariance\)/);
+});

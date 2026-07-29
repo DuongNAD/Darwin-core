@@ -154,8 +154,13 @@
   .gene-matrix{display:grid;gap:8px}
   .gene-row{display:grid;grid-template-columns:102px 1fr 54px;gap:8px;align-items:center}
   .gene-label{font-size:11px;color:var(--ink-dim)}
-  .gene-track{height:7px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden}
+  .gene-track{position:relative;height:7px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden}
   .gene-fill{height:100%;width:0;border-radius:8px;transition:width .28s ease}
+  /* Dải rộng = độ phân tán của gene trong quần thể. Chỉ số đa dạng tổng hợp
+     lấy trung bình bảy gene, nên một gene đa hình mạnh có thể bị che hoàn toàn;
+     dải này cho thấy từng gene một. */
+  .gene-spread{position:absolute;top:0;height:100%;left:0;width:0;
+    background:rgba(255,255,255,.22);border-radius:8px;transition:left .28s ease,width .28s ease}
   .gene-value{text-align:right;font:10.5px var(--mono);color:var(--ink)}
   .event-log{display:grid;gap:7px;max-height:178px;overflow:auto}
   .event-empty{font-size:11px;color:var(--ink-faint);line-height:1.45}
@@ -324,14 +329,15 @@
     <section class="card glass">
       <h2>PHÂN BỐ GENE</h2>
       <div class="gene-matrix">
-        <div class="gene-row" data-gene="speed"><span class="gene-label">Tốc độ</span><span class="gene-track"><i class="gene-fill" id="gSpeed" style="background:#ff7eb6"></i></span><span class="gene-value" id="mSpeed">—</span></div>
-        <div class="gene-row" data-gene="size"><span class="gene-label">Kích thước</span><span class="gene-track"><i class="gene-fill" id="gSize" style="background:#ffd166"></i></span><span class="gene-value" id="mSize">—</span></div>
-        <div class="gene-row" data-gene="perception"><span class="gene-label">Cảm nhận</span><span class="gene-track"><i class="gene-fill" id="gPerc" style="background:#5fe3c0"></i></span><span class="gene-value" id="mPerc">—</span></div>
-        <div class="gene-row" data-gene="metabolism"><span class="gene-label">Trao đổi chất</span><span class="gene-track"><i class="gene-fill" id="gMetabolism" style="background:#7aa7ff"></i></span><span class="gene-value" id="mMetabolism">—</span></div>
-        <div class="gene-row" data-gene="immunity"><span class="gene-label">Miễn dịch</span><span class="gene-track"><i class="gene-fill" id="gImmunity" style="background:#b997ff"></i></span><span class="gene-value" id="mImmunity">—</span></div>
-        <div class="gene-row" data-gene="camouflage"><span class="gene-label">Ngụy trang</span><span class="gene-track"><i class="gene-fill" id="gCamouflage" style="background:#8ed081"></i></span><span class="gene-value" id="mCamouflage">—</span></div>
-        <div class="gene-row" data-gene="fecundity"><span class="gene-label">Sinh sản</span><span class="gene-track"><i class="gene-fill" id="gFecundity" style="background:#ff9f68"></i></span><span class="gene-value" id="mFecundity">—</span></div>
+        <div class="gene-row" data-gene="speed"><span class="gene-label">Tốc độ</span><span class="gene-track"><i class="gene-spread" id="dSpeed"></i><i class="gene-fill" id="gSpeed" style="background:#ff7eb6"></i></span><span class="gene-value" id="mSpeed">—</span></div>
+        <div class="gene-row" data-gene="size"><span class="gene-label">Kích thước</span><span class="gene-track"><i class="gene-spread" id="dSize"></i><i class="gene-fill" id="gSize" style="background:#ffd166"></i></span><span class="gene-value" id="mSize">—</span></div>
+        <div class="gene-row" data-gene="perception"><span class="gene-label">Cảm nhận</span><span class="gene-track"><i class="gene-spread" id="dPerc"></i><i class="gene-fill" id="gPerc" style="background:#5fe3c0"></i></span><span class="gene-value" id="mPerc">—</span></div>
+        <div class="gene-row" data-gene="metabolism"><span class="gene-label">Trao đổi chất</span><span class="gene-track"><i class="gene-spread" id="dMetabolism"></i><i class="gene-fill" id="gMetabolism" style="background:#7aa7ff"></i></span><span class="gene-value" id="mMetabolism">—</span></div>
+        <div class="gene-row" data-gene="immunity"><span class="gene-label">Miễn dịch</span><span class="gene-track"><i class="gene-spread" id="dImmunity"></i><i class="gene-fill" id="gImmunity" style="background:#b997ff"></i></span><span class="gene-value" id="mImmunity">—</span></div>
+        <div class="gene-row" data-gene="camouflage"><span class="gene-label">Ngụy trang</span><span class="gene-track"><i class="gene-spread" id="dCamouflage"></i><i class="gene-fill" id="gCamouflage" style="background:#8ed081"></i></span><span class="gene-value" id="mCamouflage">—</span></div>
+        <div class="gene-row" data-gene="fecundity"><span class="gene-label">Sinh sản</span><span class="gene-track"><i class="gene-spread" id="dFecundity"></i><i class="gene-fill" id="gFecundity" style="background:#ff9f68"></i></span><span class="gene-value" id="mFecundity">—</span></div>
       </div>
+      <div class="tip">Dải sáng là khoảng trung bình ± một độ lệch chuẩn của gene trong quần thể. Chỉ số "ĐA DẠNG GENE" ở trên lấy trung bình cả bảy gene, nên một gene đa hình mạnh có thể bị che — dải này cho thấy từng gene một.</div>
       <div class="tip">▲▼ là chênh lệch chọn lọc qua sinh sản của ngày vừa khép lại (đồng nhất thức Robertson–Price), tính theo phần trăm dải gene. Nó không bao gồm chọn lọc qua sống sót, nên có thể ngược chiều với thay đổi thực tế.</div>
     </section>
 
@@ -1686,11 +1692,21 @@ globalThis.DarwinEngine = {
     line(world.history,'diversity',maxDiversity,'#ffd166');
   }
 
-  function updateGeneMeters(stats,selection){
+  function updateGeneMeters(stats,selection,variance){
     for(const key of GENE_KEYS){
       const [, ,fillId,valueId]=GENE_UI[key];
       const value=stats[key]||0;
       $('#'+fillId).style.width=(normalized(value,key)*100).toFixed(1)+'%';
+      // dải mean ± 1 độ lệch chuẩn, quy về phần trăm dải gene
+      const spread=$('#'+fillId.replace(/^g/,'d'));
+      if(spread){
+        const range=RANGE[key];
+        const sd=Math.sqrt(Math.max(0,(variance&&variance[key])||0))/(range[1]-range[0]);
+        const centre=normalized(value,key);
+        const low=clamp(centre-sd,0,1), high=clamp(centre+sd,0,1);
+        spread.style.left=(low*100).toFixed(1)+'%';
+        spread.style.width=((high-low)*100).toFixed(1)+'%';
+      }
       const text=key==='perception'?value.toFixed(0):value.toFixed(2);
       // Chênh lệch chọn lọc chuẩn hoá theo dải gene, để bảy gene có thể so với nhau.
       const range=RANGE[key];
@@ -1795,7 +1811,7 @@ globalThis.DarwinEngine = {
     $('#seedLbl').textContent=world.seed;
     $('#conclusion').textContent=world.scientificConclusion();
     $('#compareTag').textContent=compareMode&&worldB?'CÙNG SEED · HAI MÔI TRƯỜNG':'';
-    updateGeneMeters(stats,metrics.selectionDifferential);
+    updateGeneMeters(stats,metrics.selectionDifferential,metrics.geneVariance);
     drawResearchChart();
     updateEvents();
     updateComparison();
