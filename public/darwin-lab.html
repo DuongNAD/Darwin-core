@@ -319,7 +319,9 @@
     <section class="card glass">
       <h2>SỐ LIỆU SỐNG</h2>
       <div class="stats research">
-        <div class="stat"><div class="k">QUẦN THỂ</div><div class="v" id="sPop">0</div></div>
+        <div class="stat" data-tip="Loài ăn cỏ — quần thể được nghiên cứu. Mọi chỉ số di truyền tính trên loài này."><div class="k">LOÀI ĂN CỎ</div><div class="v" id="sPop">0</div></div>
+        <div class="stat" data-tip="Loài ăn thịt là một loài riêng, chỉ xuất hiện khi bật săn mồi, từ ngày 7."><div class="k">LOÀI ĂN THỊT</div><div class="v" id="sCarnivores">0</div></div>
+        <div class="stat" data-tip="Chỉ cây trưởng thành mới ăn được. Số trong ngoặc là tổng cả mầm non."><div class="k">CÂY TRƯỞNG THÀNH</div><div class="v" id="sPlants">0</div></div>
         <div class="stat"><div class="k">NGÀY / THẾ HỆ</div><div class="v" id="sDay">0<small id="sGen">g0</small></div></div>
         <div class="stat"><div class="k">THỨC ĂN CÒN LẠI</div><div class="v" id="sFood">0</div></div>
         <div class="stat"><div class="k">SINH / CHẾT</div><div class="v" id="sBD">0<small>/0</small></div></div>
@@ -335,7 +337,7 @@
     <section class="card glass">
       <h2>ĐƯỜNG CONG NGHIÊN CỨU</h2>
       <div class="chartwrap"><canvas id="researchChart" class="mini" role="img" aria-label="Đường cong quần thể và đa dạng di truyền theo ngày; số liệu từng ngày có ở thanh dòng thời gian bên dưới."></canvas></div>
-      <div class="tip">Xanh: quần thể A · Hồng: quần thể B · Vàng: đa dạng di truyền.</div>
+      <div class="tip">Xanh lá nhạt: cây trưởng thành · Xanh ngọc: loài ăn cỏ (A) · Hồng: quần thể B · Đỏ: loài ăn thịt · Vàng: đa dạng di truyền. Mỗi đường có thang riêng nên chỉ so được hình dạng, không so được độ cao.</div>
     </section>
 
     <section class="card glass">
@@ -390,7 +392,8 @@
         <button id="ctlNudgeDown">Dịch −10%</button>
       </div>
       <div class="control-actions">
-        <button id="ctlInject">Tiêm 20 cá thể</button>
+        <button id="ctlInject">Tiêm 20 ăn cỏ</button>
+        <button id="ctlInjectPredator">Tiêm 6 ăn thịt</button>
         <button id="ctlCull">Loại bỏ 50%</button>
         <button id="ctlFood">Thêm 200 thức ăn</button>
       </div>
@@ -1241,6 +1244,9 @@ class World {
       speed:s.speed, size:s.size, perception:s.perception,
       metabolism:s.metabolism, immunity:s.immunity,
       camouflage:s.camouflage, fecundity:s.fecundity,
+      // ba bậc dinh dưỡng theo ngày, để vẽ được dòng năng lượng theo thời gian
+      carnivores:r.trophic.carnivores,
+      plantsGrown:r.trophic.plantsGrown,
       diversity:r.geneticDiversity,
       meanOffspring:r.meanOffspring,
       energy:r.meanEnergy,
@@ -1596,6 +1602,7 @@ function exportExperiment(world,format){
       ['diversity','diversity'],['mean_offspring','meanOffspring'],
       ['energy','energy'],['effective_lineages','effectiveLineages'],
       ['lineages','lineages'],
+      ['carnivores','carnivores'],['plants_grown','plantsGrown'],
       ['speed','speed'],['size','size'],['perception','perception'],
       ['metabolism','metabolism'],['immunity','immunity'],
       ['camouflage','camouflage'],['fecundity','fecundity']
@@ -1644,20 +1651,23 @@ class Controller {
       interventions:w.interventions.length
     };
   }
-  genePool(){
+  // Mặc định đọc loài ăn cỏ, khớp với mọi chỉ số khác. Truyền 'carnivore' để
+  // xem bộ gene của loài săn mồi.
+  genePool(species){
     const w = this.world, out = {};
-    const stats = w.stats(), variance = w.researchMetrics().geneVariance;
+    const list = species === CARNIVORE ? w.carnivores() : w.herbivores();
+    const stats = w.stats(list), variance = w.researchMetrics().geneVariance;
     for(const key of GENE_KEYS){
       let low = Infinity, high = -Infinity;
-      for(const c of w.creatures){
+      for(const c of list){
         if(c.genes[key] < low) low = c.genes[key];
         if(c.genes[key] > high) high = c.genes[key];
       }
       out[key] = {
         mean:stats[key] || 0,
         sd:Math.sqrt(Math.max(0, variance[key] || 0)),
-        min:w.creatures.length ? low : null,
-        max:w.creatures.length ? high : null,
+        min:list.length ? low : null,
+        max:list.length ? high : null,
         range:[...RANGE[key]]
       };
     }
@@ -1683,12 +1693,15 @@ class Controller {
     const w = this.world;
     const count = Math.max(1, Math.min((spec && spec.count) || 1, 200));
     const wanted = (spec && spec.genes) || {};
-    const stats = w.stats();
+    const species = (spec && spec.species) === CARNIVORE ? CARNIVORE : HERBIVORE;
+    // gene bỏ trống lấy theo chính loài đó, không lấy trung bình trộn hai loài
+    const kin = species === CARNIVORE ? w.carnivores() : w.herbivores();
+    const stats = w.stats(kin);
     const born = [];
     for(let i=0;i<count;i++){
       const genes = {};
       for(const key of GENE_KEYS){
-        const fallback = w.creatures.length ? stats[key] : (RANGE[key][0]+RANGE[key][1])/2;
+        const fallback = kin.length ? stats[key] : (RANGE[key][0]+RANGE[key][1])/2;
         const value = wanted[key] !== undefined ? Number(wanted[key]) : fallback;
         genes[key] = clamp(value, RANGE[key][0], RANGE[key][1]);
       }
@@ -1698,14 +1711,16 @@ class Controller {
         clamp(spec && spec.y !== undefined ? spec.y : w.rr(20, w.H-20), 6, w.H-6),
         genes,
         (spec && spec.energy) || 110,
-        w.day, 0
+        w.day, 0,
+        (spec && spec.species) === CARNIVORE ? CARNIVORE : HERBIVORE
       );
       creature.heading = w.rr(0, Math.PI*2);
       w.creatures.push(creature);
       born.push(creature.id);
     }
-    this.note('tiêm cá thể', `${count} cá thể, gene đặt: ${Object.keys(wanted).join(', ') || 'không'}`);
-    return { injected:born.length, ids:born, population:w.creatures.length };
+    this.note('tiêm cá thể',
+      `${count} ${species===CARNIVORE?'ăn thịt':'ăn cỏ'}, gene đặt: ${Object.keys(wanted).join(', ') || 'không'}`);
+    return { injected:born.length, ids:born, species, population:w.creatures.length };
   }
   // Đặt thẳng một gene cho một phần quần thể — dùng để tạo đột biến nhân tạo.
   setGene(key, value, options){
@@ -2035,8 +2050,14 @@ globalThis.DarwinEngine = {
       });
       context.strokeStyle=color;context.lineWidth=1.8;context.stroke();
     }
+    // Ba bậc trên cùng một trục: thảm thực vật trưởng thành, loài ăn cỏ, loài
+    // ăn thịt — nhìn được cả chu kỳ săn mồi–con mồi lẫn sức ép lên thực vật.
+    const maxPlants=Math.max(10,...world.history.map(row=>row.plantsGrown||0));
+    line(world.history,'plantsGrown',maxPlants,'rgba(120,175,110,.55)');
     line(world.history,'pop',maxPop,'#5fe3c0');
     if(compareMode&&worldB)line(worldB.history,'pop',maxPop,'#ff7eb6');
+    const maxCarn=Math.max(5,...world.history.map(row=>row.carnivores||0));
+    if(maxCarn>5)line(world.history,'carnivores',maxCarn,'#e0685c');
     const maxDiversity=Math.max(.03,...world.history.map(row=>row.diversity||0));
     line(world.history,'diversity',maxDiversity,'#ffd166');
   }
@@ -2148,6 +2169,9 @@ globalThis.DarwinEngine = {
     $('#sFitness').textContent=metrics.meanOffspring.toFixed(2);
     $('#sEffective').textContent=metrics.effectiveLineages.toFixed(1);
     $('#sTemperature').innerHTML=world.environment.temperature.toFixed(1)+'<small>°C</small>';
+    $('#sCarnivores').textContent=metrics.trophic.carnivores;
+    $('#sPlants').innerHTML=metrics.trophic.plantsGrown+
+      '<small>/'+metrics.trophic.plants+'</small>';
     $('#sLineages').textContent=metrics.lineages;
     $('#sDifferentiation').textContent=metrics.differentiation
       ? metrics.differentiation.mean.toFixed(3) : '—';
@@ -2572,6 +2596,10 @@ self.onmessage=function(event){
     const key=controlGene();
     const result=control.inject({count:20,genes:{[key]:+$('#ctlValue').value}});
     afterIntervention(`Đã tiêm ${result.injected} cá thể`);
+  });
+  $('#ctlInjectPredator').addEventListener('click',()=>{
+    const result=control.inject({count:6,species:'carnivore',energy:180});
+    afterIntervention(`Đã thả ${result.injected} cá thể ăn thịt`);
   });
   $('#ctlCull').addEventListener('click',()=>{
     const result=control.cull({fraction:0.5});

@@ -107,6 +107,77 @@ test("grazing pressure leaves a real mix of seedlings and grown cover", () => {
   assert.ok(share < 0.95, `grazing must bite (${(share * 100).toFixed(0)}%)`);
 });
 
+test("the two species are counted and measured apart", () => {
+  const engine = loadEngine();
+  const world = new engine.World({ seed: 11, scenario: "predator" });
+  world.runTicks(engine.TICKS_PER_DAY * 12);
+
+  const metrics = world.researchMetrics();
+  assert.equal(metrics.trophic.herbivores, world.herbivores().length);
+  assert.equal(metrics.trophic.carnivores, world.carnivores().length);
+  assert.equal(metrics.trophic.plants, world.food.length);
+  assert.ok(metrics.trophic.plantsGrown <= metrics.trophic.plants);
+  assert.ok(metrics.trophic.carnivores > 0, "hunters arrive by day 7");
+
+  // Genetic metrics describe the herbivores only. Averaging two species under
+  // opposing selection would corrupt every one of them.
+  assert.equal(metrics.population, world.herbivores().length);
+  assert.notEqual(world.creatures.length, world.herbivores().length);
+  const herbivoreMean = world.stats().speed;
+  const mixedMean = world.stats(world.creatures).speed;
+  assert.notEqual(herbivoreMean, mixedMean, "the split has to actually matter");
+
+  const row = world.history.at(-1);
+  assert.equal(typeof row.carnivores, "number");
+  assert.equal(typeof row.plantsGrown, "number");
+  const header = engine.exportExperiment(world, "csv").split("\n")[0].split(",");
+  assert.ok(header.includes("carnivores") && header.includes("plants_grown"));
+});
+
+test("hunters breed true and never eat plants", () => {
+  const engine = loadEngine();
+  const world = new engine.World({ seed: 22, scenario: "predator" });
+  world.runTicks(engine.TICKS_PER_DAY * 20);
+
+  for (const creature of world.creatures) {
+    assert.ok(["herbivore", "carnivore"].includes(creature.species), creature.species);
+  }
+  // Offspring keep their parent's species; no hybrids exist.
+  const born = world.carnivores().filter((c) => c.gen > 0);
+  assert.ok(born.length > 0, "hunters should be reproducing");
+  for (const child of born) {
+    const parent = world.creatures.find((c) => c.id === child.parentId);
+    if (parent) assert.equal(parent.species, "carnivore");
+  }
+
+  // A hunter parked on a grown plant leaves it alone.
+  const hunter = world.carnivores()[0];
+  world.creatures = [hunter];
+  world.food = [{ x: hunter.x, y: hunter.y, growth: 1 }];
+  world.step();
+  assert.equal(world.food.length, 1, "carnivores do not graze");
+});
+
+test("the control port can seed either species", () => {
+  const engine = loadEngine();
+  const world = new engine.World({ seed: 5, scenario: "baseline" });
+  world.runTicks(engine.TICKS_PER_DAY * 3);
+  const control = new engine.Controller(() => world);
+
+  const hunters = control.inject({ count: 4, species: "carnivore" });
+  assert.equal(hunters.species, "carnivore");
+  assert.equal(world.carnivores().length, 4);
+
+  const grazers = control.inject({ count: 3 });
+  assert.equal(grazers.species, "herbivore");
+  assert.equal(world.carnivores().length, 4, "the default must not add hunters");
+
+  // Gene pools are reported per species, not blended.
+  assert.ok(Number.isFinite(control.genePool("carnivore").speed.mean));
+  assert.ok(Number.isFinite(control.genePool().speed.mean));
+  assert.equal(control.state().population, world.herbivores().length);
+});
+
 test("plants survive save and restore", () => {
   const engine = loadEngine();
   const world = new engine.World({ seed: 5, scenario: "baseline" });
