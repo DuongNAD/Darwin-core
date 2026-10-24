@@ -1,0 +1,7 @@
+{
+  "name": "Darwin-core",
+  "category": "03_Engines_Simulation",
+  "tech": "Node.js",
+  "command": "npm run dev",
+  "description": "DARWIN LAB - Mô hình chọn lọc tự nhiên"
+}
